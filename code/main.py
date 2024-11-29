@@ -11,6 +11,9 @@ import time
 from core.utils import calculate_Accuracy, get_img_list, get_model, get_data
 from pylab import *
 import random
+import warnings
+warnings.filterwarnings('ignore')
+torch.set_warn_always(False)
 plt.switch_backend('agg')
 
 # --------------------------------------------------------------------------------
@@ -50,16 +53,16 @@ parser.add_argument('--my_description', type=str, default='CHASEDB1_500DGNet',
 # ---------------------------
 # GPU
 # ---------------------------
-parser.add_argument('--use_gpu', type=bool, default=False,
+parser.add_argument('--use_gpu', action='store_true',
                     help='dir of the all ori img')
-parser.add_argument('--gpu_avaiable', type=str, default='3',
+parser.add_argument('--gpu_available', type=str, default='3',
                     help='the gpu used')
 
 args = parser.parse_args()
 print(args)
 # --------------------------------------------------------------------------------
-os.environ['CUDA_DEVICE_ORDER'] = "PCI_BUS_ID"
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_avaiable
+#os.environ['CUDA_DEVICE_ORDER'] = "PCI_BUS_ID"
+#os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_available
 
 def fast_test(model, args, img_list, model_name):
     softmax_2d = nn.Softmax2d()
@@ -115,7 +118,7 @@ def fast_test(model, args, img_list, model_name):
 
 
 #RootDir = os.getcwd()
-RootDir = "/code"
+RootDir = "./code"
 model_name = models_list[args.model_id]
 Dataset = dataset_list[args.datasetID]
 SubID = args.SubImageID
@@ -129,7 +132,7 @@ if torch.cuda.device_count() > 1:
 
 if args.use_gpu:
     model.cuda()
-    print('GPUs used: (%s)' % args.gpu_avaiable)
+    print('GPUs used: (%s)' % args.gpu_available)
     print('------- success use GPU --------')
 
 EPS = 1e-12

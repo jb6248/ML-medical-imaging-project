@@ -133,6 +133,7 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
         imgGrey = imgGrey[np.newaxis,:,:]
 
         img = np.transpose(img, [2, 0, 1])
+        img = img.copy()
         img = Variable(torch.from_numpy(img)).float()
         imgGrey = Variable(torch.from_numpy(imgGrey)).double()
 
@@ -141,6 +142,9 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
             imgGrey = imgGrey.cuda()
 
         label, tmp_gt = get_label(label)
+        if torch.max(label) > 2:
+            label[label < 255] = 0
+            label[label == 255] = 1
         images.append(img)
         labels.append(label)
         tmp_gts.append(tmp_gt)
