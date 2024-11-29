@@ -1,0 +1,18 @@
+metadata_version: 1
+name: Deep Guidance Network for Biomedical Image Segmentation
+description: Deep Guidance Network for Biomedical Image Segmentation
+tags:
+- Guided Filter
+- Medical Image Segmentation
+- Image Segmentation
+- u-net
+- retinal vessel segmentation
+- optic disc and cup segmentation
+- fundus image
+authors:
+- name: Pengshuai Yin
+  affiliations:
+  - name: South China University of Technology
+corresponding_contributor:
+  name: Pengshuai Yin
+  email: pshuai.yin@gmail.com
