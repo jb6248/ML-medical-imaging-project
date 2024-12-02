@@ -7,7 +7,7 @@ My changes:
       all of those
 - fix labels when training
     - for some reason it was passing a greyscale image as the label instead of
-      the segmented one (see commit history)
+      the segmented one (see commit 6a4bcd64a8bb85f0e8af4644df79884b0ecbb498 "fix a couple other bugs" )
 - add logs folder
 - copy images before sending them to avoid some weird negative slicing error
 - suppress all warnings (at the top of main.py) for clarity
