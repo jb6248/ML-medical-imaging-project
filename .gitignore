@@ -3,5 +3,5 @@ data/
 
 logs/
 models/
-experiment_runs/*
-!experiment_runs/**/
+experiment_runs/
+
