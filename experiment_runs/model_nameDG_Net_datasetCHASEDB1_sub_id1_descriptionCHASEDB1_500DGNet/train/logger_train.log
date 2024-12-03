@@ -1,0 +1,177 @@
+argument_directory_base_path_train: ./experiment_runs/model_nameDG_Net_datasetCHASEDB1_sub_id1_descriptionCHASEDB1_500DGNet/train
+log_file_path: ./experiment_runs/model_nameDG_Net_datasetCHASEDB1_sub_id1_descriptionCHASEDB1_500DGNet/train/logger_train.log
+model name: DG_Net
+dataset: CHASEDB1
+sub image ID: 1
+model: <class 'core.models.DG_Net'>
+This model is DG_Net_2_512_CHASEDB1_500DGNet
+
+GPUs used: (3)
+------- success use GPU --------
+#################### EPOCH #1 ####################
+This model is DG_Net_2_512_CHASEDB1_500DGNet
+epoch_batch: 0_0 | loss: 3.045030  | Acc: 0.031 | Se: 0.978 | Sp: 0.033| Background_IOU: 0.033072, vessel_IOU: 0.000343
+epoch_batch: 0_1 | loss: 2.055609  | Acc: 0.054 | Se: 0.992 | Sp: 0.061| Background_IOU: 0.060325, vessel_IOU: 0.000513
+epoch_batch: 0_2 | loss: 1.794283  | Acc: 0.194 | Se: 0.941 | Sp: 0.216| Background_IOU: 0.211544, vessel_IOU: 0.000464
+epoch_batch: 0_3 | loss: 1.675835  | Acc: 0.217 | Se: 0.813 | Sp: 0.242| Background_IOU: 0.233851, vessel_IOU: 0.000441
+epoch_batch: 0_4 | loss: 1.553224  | Acc: 0.315 | Se: 0.657 | Sp: 0.354| Background_IOU: 0.337075, vessel_IOU: 0.000411
+epoch_batch: 0_5 | loss: 1.376489  | Acc: 0.527 | Se: 0.532 | Sp: 0.578| Background_IOU: 0.547067, vessel_IOU: 0.000453
+epoch_batch: 0_6 | loss: 1.440281  | Acc: 0.663 | Se: 0.398 | Sp: 0.739| Background_IOU: 0.688062, vessel_IOU: 0.000634
+epoch_batch: 0_7 | loss: 1.374928  | Acc: 0.792 | Se: 0.109 | Sp: 0.885| Background_IOU: 0.803522, vessel_IOU: 0.000390
+epoch_batch: 0_8 | loss: 1.223380  | Acc: 0.832 | Se: 0.147 | Sp: 0.915| Background_IOU: 0.837345, vessel_IOU: 0.000727
+epoch_batch: 0_9 | loss: 1.358645  | Acc: 0.878 | Se: 0.000 | Sp: 0.982| Background_IOU: 0.880836, vessel_IOU: 0.000000
+epoch_batch: 0_10 | loss: 1.317376  | Acc: 0.860 | Se: 0.053 | Sp: 0.970| Background_IOU: 0.862268, vessel_IOU: 0.000882
+epoch_batch: 0_11 | loss: 1.274534  | Acc: 0.886 | Se: 0.016 | Sp: 0.988| Background_IOU: 0.886431, vessel_IOU: 0.000621
+epoch_batch: 0_12 | loss: 1.226689  | Acc: 0.894 | Se: 0.000 | Sp: 0.999| Background_IOU: 0.894470, vessel_IOU: 0.000000
+epoch_batch: 0_13 | loss: 1.015482  | Acc: 0.907 | Se: 0.000 | Sp: 0.999| Background_IOU: 0.907316, vessel_IOU: 0.000000
+epoch_batch: 0_14 | loss: 1.206815  | Acc: 0.891 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.890814, vessel_IOU: 0.000000
+epoch_batch: 0_15 | loss: 1.187506  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896466, vessel_IOU: 0.000000
+epoch_batch: 0_16 | loss: 1.096097  | Acc: 0.890 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.890010, vessel_IOU: 0.000000
+epoch_batch: 0_17 | loss: 1.045848  | Acc: 0.903 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.903164, vessel_IOU: 0.000000
+epoch_batch: 0_18 | loss: 0.940498  | Acc: 0.908 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.908398, vessel_IOU: 0.000000
+epoch_batch: 0_19 | loss: 0.884008  | Acc: 0.928 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.927624, vessel_IOU: 0.000000
+Epoch finished, time: 13.1 s
+Mean accuracy 0.67330325
+Successfully saved the best model
+************************************************************
+
+#################### EPOCH #2 ####################
+This model is DG_Net_2_512_CHASEDB1_500DGNet
+epoch_batch: 1_0 | loss: 0.882034  | Acc: 0.908 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.908466, vessel_IOU: 0.000000
+epoch_batch: 1_1 | loss: 1.073721  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896866, vessel_IOU: 0.000000
+epoch_batch: 1_2 | loss: 0.789117  | Acc: 0.926 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.925987, vessel_IOU: 0.000000
+epoch_batch: 1_3 | loss: 1.006675  | Acc: 0.889 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.888977, vessel_IOU: 0.000000
+epoch_batch: 1_4 | loss: 0.992929  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896641, vessel_IOU: 0.000000
+epoch_batch: 1_5 | loss: 1.017545  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896294, vessel_IOU: 0.000000
+epoch_batch: 1_6 | loss: 1.009276  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896576, vessel_IOU: 0.000000
+epoch_batch: 1_7 | loss: 0.962393  | Acc: 0.891 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.890789, vessel_IOU: 0.000000
+epoch_batch: 1_8 | loss: 0.944468  | Acc: 0.890 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.890049, vessel_IOU: 0.000000
+epoch_batch: 1_9 | loss: 0.747713  | Acc: 0.928 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.927704, vessel_IOU: 0.000000
+epoch_batch: 1_10 | loss: 0.777978  | Acc: 0.909 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.908585, vessel_IOU: 0.000000
+epoch_batch: 1_11 | loss: 1.001523  | Acc: 0.884 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.884308, vessel_IOU: 0.000000
+epoch_batch: 1_12 | loss: 0.946745  | Acc: 0.893 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.893288, vessel_IOU: 0.000000
+epoch_batch: 1_13 | loss: 0.920860  | Acc: 0.886 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.886429, vessel_IOU: 0.000000
+epoch_batch: 1_14 | loss: 0.877365  | Acc: 0.894 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.894421, vessel_IOU: 0.000000
+epoch_batch: 1_15 | loss: 0.742763  | Acc: 0.911 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.911247, vessel_IOU: 0.000000
+epoch_batch: 1_16 | loss: 0.821133  | Acc: 0.895 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.895260, vessel_IOU: 0.000000
+epoch_batch: 1_17 | loss: 0.791417  | Acc: 0.903 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.903217, vessel_IOU: 0.000000
+epoch_batch: 1_18 | loss: 0.648682  | Acc: 0.908 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.907650, vessel_IOU: 0.000000
+epoch_batch: 1_19 | loss: 0.785790  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.895760, vessel_IOU: 0.000000
+Epoch finished, time: 12.5 s
+Mean accuracy 0.8999256
+Successfully saved the best model
+************************************************************
+
+#################### EPOCH #3 ####################
+This model is DG_Net_2_512_CHASEDB1_500DGNet
+epoch_batch: 2_0 | loss: 0.686994  | Acc: 0.911 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.911350, vessel_IOU: 0.000000
+epoch_batch: 2_1 | loss: 0.846613  | Acc: 0.887 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.886604, vessel_IOU: 0.000000
+epoch_batch: 2_2 | loss: 0.627609  | Acc: 0.926 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.925884, vessel_IOU: 0.000000
+epoch_batch: 2_3 | loss: 0.745173  | Acc: 0.895 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.895317, vessel_IOU: 0.000000
+epoch_batch: 2_4 | loss: 0.801154  | Acc: 0.894 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.894428, vessel_IOU: 0.000000
+epoch_batch: 2_5 | loss: 0.595367  | Acc: 0.928 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.927685, vessel_IOU: 0.000000
+epoch_batch: 2_6 | loss: 0.811271  | Acc: 0.884 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.884262, vessel_IOU: 0.000000
+epoch_batch: 2_7 | loss: 0.722746  | Acc: 0.889 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.888912, vessel_IOU: 0.000000
+epoch_batch: 2_8 | loss: 0.759137  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896881, vessel_IOU: 0.000000
+epoch_batch: 2_9 | loss: 0.835738  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896648, vessel_IOU: 0.000000
+epoch_batch: 2_10 | loss: 0.773730  | Acc: 0.893 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.893322, vessel_IOU: 0.000000
+epoch_batch: 2_11 | loss: 0.638152  | Acc: 0.909 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.908585, vessel_IOU: 0.000000
+epoch_batch: 2_12 | loss: 0.746873  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896702, vessel_IOU: 0.000000
+epoch_batch: 2_13 | loss: 0.799232  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896339, vessel_IOU: 0.000000
+epoch_batch: 2_14 | loss: 0.585434  | Acc: 0.909 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.908501, vessel_IOU: 0.000000
+epoch_batch: 2_15 | loss: 0.741559  | Acc: 0.891 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.890919, vessel_IOU: 0.000000
+epoch_batch: 2_16 | loss: 0.667997  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.895630, vessel_IOU: 0.000000
+epoch_batch: 2_17 | loss: 0.657689  | Acc: 0.903 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.903286, vessel_IOU: 0.000000
+epoch_batch: 2_18 | loss: 0.517275  | Acc: 0.908 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.907822, vessel_IOU: 0.000000
+epoch_batch: 2_19 | loss: 0.684248  | Acc: 0.890 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.890175, vessel_IOU: 0.000000
+Epoch finished, time: 12.5 s
+Mean accuracy 0.8999626
+Successfully saved the best model
+************************************************************
+
+#################### EPOCH #4 ####################
+This model is DG_Net_2_512_CHASEDB1_500DGNet
+epoch_batch: 3_0 | loss: 0.720549  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896549, vessel_IOU: 0.000000
+epoch_batch: 3_1 | loss: 0.540589  | Acc: 0.928 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.927841, vessel_IOU: 0.000000
+epoch_batch: 3_2 | loss: 0.510420  | Acc: 0.926 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.925915, vessel_IOU: 0.000000
+epoch_batch: 3_3 | loss: 0.752902  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896416, vessel_IOU: 0.000000
+epoch_batch: 3_4 | loss: 0.699129  | Acc: 0.891 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.890957, vessel_IOU: 0.000000
+epoch_batch: 3_5 | loss: 0.657935  | Acc: 0.903 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.903202, vessel_IOU: 0.000000
+epoch_batch: 3_6 | loss: 0.614665  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.895748, vessel_IOU: 0.000000
+epoch_batch: 3_7 | loss: 0.798750  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896862, vessel_IOU: 0.000000
+epoch_batch: 3_8 | loss: 0.754826  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.896675, vessel_IOU: 0.000000
+epoch_batch: 3_9 | loss: 0.656688  | Acc: 0.893 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.893272, vessel_IOU: 0.000000
+epoch_batch: 3_10 | loss: 0.597876  | Acc: 0.909 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.908569, vessel_IOU: 0.000000
+epoch_batch: 3_11 | loss: 0.707085  | Acc: 0.890 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.890339, vessel_IOU: 0.000000
+epoch_batch: 3_12 | loss: 0.541272  | Acc: 0.909 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.908573, vessel_IOU: 0.000000
+epoch_batch: 3_13 | loss: 0.733151  | Acc: 0.884 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.884262, vessel_IOU: 0.000000
+epoch_batch: 3_14 | loss: 0.541719  | Acc: 0.911 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.911251, vessel_IOU: 0.000000
+epoch_batch: 3_15 | loss: 0.477946  | Acc: 0.908 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.907650, vessel_IOU: 0.000000
+epoch_batch: 3_16 | loss: 0.619845  | Acc: 0.889 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.888942, vessel_IOU: 0.000000
+epoch_batch: 3_17 | loss: 0.694322  | Acc: 0.894 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.894491, vessel_IOU: 0.000000
+epoch_batch: 3_18 | loss: 0.705592  | Acc: 0.887 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.886530, vessel_IOU: 0.000000
+epoch_batch: 3_19 | loss: 0.599097  | Acc: 0.895 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.895393, vessel_IOU: 0.000000
+Epoch finished, time: 12.5 s
+Mean accuracy 0.89996684
+Successfully saved the best model
+************************************************************
+
+#################### EPOCH #5 ####################
+This model is DG_Net_2_512_CHASEDB1_500DGNet
+epoch_batch: 4_0 | loss: 0.656381  | Acc: 0.886 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.886667, vessel_IOU: 0.000000
+epoch_batch: 4_1 | loss: 0.716679  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.897192, vessel_IOU: 0.000000
+epoch_batch: 4_2 | loss: 0.669512  | Acc: 0.891 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.892050, vessel_IOU: 0.000000
+epoch_batch: 4_3 | loss: 0.698873  | Acc: 0.897 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.897573, vessel_IOU: 0.000000
+epoch_batch: 4_4 | loss: 0.618795  | Acc: 0.890 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.891392, vessel_IOU: 0.000000
+epoch_batch: 4_5 | loss: 0.485825  | Acc: 0.926 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.926361, vessel_IOU: 0.000000
+epoch_batch: 4_6 | loss: 0.502058  | Acc: 0.909 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.910746, vessel_IOU: 0.000000
+epoch_batch: 4_7 | loss: 0.611400  | Acc: 0.893 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.895915, vessel_IOU: 0.000000
+epoch_batch: 4_8 | loss: 0.454045  | Acc: 0.907 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.913392, vessel_IOU: 0.000000
+epoch_batch: 4_9 | loss: 0.630894  | Acc: 0.894 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.900075, vessel_IOU: 0.000000
+epoch_batch: 4_10 | loss: 0.475014  | Acc: 0.928 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.932452, vessel_IOU: 0.000000
+epoch_batch: 4_11 | loss: 0.637685  | Acc: 0.884 | Se: 0.008 | Sp: 1.000| Background_IOU: 0.892014, vessel_IOU: 0.000402
+epoch_batch: 4_12 | loss: 0.662427  | Acc: 0.896 | Se: 0.021 | Sp: 1.000| Background_IOU: 0.899918, vessel_IOU: 0.001744
+epoch_batch: 4_13 | loss: 0.526530  | Acc: 0.911 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.914450, vessel_IOU: 0.000000
+epoch_batch: 4_14 | loss: 0.574152  | Acc: 0.895 | Se: 0.020 | Sp: 1.000| Background_IOU: 0.903827, vessel_IOU: 0.000780
+epoch_batch: 4_15 | loss: 0.677487  | Acc: 0.895 | Se: 0.040 | Sp: 0.999| Background_IOU: 0.901603, vessel_IOU: 0.002254
+epoch_batch: 4_16 | loss: 0.537950  | Acc: 0.888 | Se: 0.000 | Sp: 0.999| Background_IOU: 0.902160, vessel_IOU: 0.000000
+epoch_batch: 4_17 | loss: 0.514832  | Acc: 0.903 | Se: 0.008 | Sp: 1.000| Background_IOU: 0.913182, vessel_IOU: 0.000311
+epoch_batch: 4_18 | loss: 0.473487  | Acc: 0.908 | Se: 0.018 | Sp: 0.999| Background_IOU: 0.917698, vessel_IOU: 0.000633
+epoch_batch: 4_19 | loss: 0.530005  | Acc: 0.895 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.902841, vessel_IOU: 0.000000
+Epoch finished, time: 12.5 s
+Mean accuracy 0.8996881
+************************************************************
+
+#################### EPOCH #6 ####################
+This model is DG_Net_2_512_CHASEDB1_500DGNet
+epoch_batch: 5_0 | loss: 0.668465  | Acc: 0.886 | Se: 0.016 | Sp: 0.999| Background_IOU: 0.894779, vessel_IOU: 0.000697
+epoch_batch: 5_1 | loss: 0.584922  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.905844, vessel_IOU: 0.000000
+epoch_batch: 5_2 | loss: 0.427014  | Acc: 0.907 | Se: 0.009 | Sp: 0.999| Background_IOU: 0.921986, vessel_IOU: 0.000215
+epoch_batch: 5_3 | loss: 0.446021  | Acc: 0.926 | Se: 0.012 | Sp: 1.000| Background_IOU: 0.936060, vessel_IOU: 0.000321
+epoch_batch: 5_4 | loss: 0.523465  | Acc: 0.907 | Se: 0.027 | Sp: 0.999| Background_IOU: 0.917817, vessel_IOU: 0.000893
+epoch_batch: 5_5 | loss: 0.588345  | Acc: 0.890 | Se: 0.018 | Sp: 0.999| Background_IOU: 0.903785, vessel_IOU: 0.000468
+epoch_batch: 5_6 | loss: 0.520404  | Acc: 0.895 | Se: 0.010 | Sp: 1.000| Background_IOU: 0.907068, vessel_IOU: 0.000269
+epoch_batch: 5_7 | loss: 0.514449  | Acc: 0.896 | Se: 0.057 | Sp: 1.000| Background_IOU: 0.910185, vessel_IOU: 0.001363
+epoch_batch: 5_8 | loss: 0.450845  | Acc: 0.910 | Se: 0.011 | Sp: 0.999| Background_IOU: 0.929817, vessel_IOU: 0.000168
+epoch_batch: 5_9 | loss: 0.552975  | Acc: 0.900 | Se: 0.032 | Sp: 0.996| Background_IOU: 0.914362, vessel_IOU: 0.000793
+epoch_batch: 5_10 | loss: 0.582923  | Acc: 0.896 | Se: 0.063 | Sp: 0.999| Background_IOU: 0.913496, vessel_IOU: 0.001455
+epoch_batch: 5_11 | loss: 0.550467  | Acc: 0.889 | Se: 0.008 | Sp: 0.998| Background_IOU: 0.908798, vessel_IOU: 0.000158
+epoch_batch: 5_12 | loss: 0.555154  | Acc: 0.893 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.912028, vessel_IOU: 0.000000
+epoch_batch: 5_13 | loss: 0.542808  | Acc: 0.886 | Se: 0.018 | Sp: 0.997| Background_IOU: 0.906355, vessel_IOU: 0.000304
+epoch_batch: 5_14 | loss: 0.453697  | Acc: 0.906 | Se: 0.026 | Sp: 0.998| Background_IOU: 0.922970, vessel_IOU: 0.000556
+epoch_batch: 5_15 | loss: 0.582573  | Acc: 0.893 | Se: 0.028 | Sp: 0.999| Background_IOU: 0.908213, vessel_IOU: 0.000624
+epoch_batch: 5_16 | loss: 0.584958  | Acc: 0.884 | Se: 0.008 | Sp: 1.000| Background_IOU: 0.898382, vessel_IOU: 0.000230
+epoch_batch: 5_17 | loss: 0.565785  | Acc: 0.896 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.909863, vessel_IOU: 0.000000
+epoch_batch: 5_18 | loss: 0.546747  | Acc: 0.895 | Se: 0.009 | Sp: 0.998| Background_IOU: 0.911759, vessel_IOU: 0.000189
+epoch_batch: 5_19 | loss: 0.428795  | Acc: 0.927 | Se: 0.021 | Sp: 0.999| Background_IOU: 0.942438, vessel_IOU: 0.000415
+Epoch finished, time: 12.7 s
+Mean accuracy 0.89889467
+************************************************************
+
+#################### EPOCH #7 ####################
+This model is DG_Net_2_512_CHASEDB1_500DGNet
+epoch_batch: 6_0 | loss: 0.532532  | Acc: 0.896 | Se: 0.016 | Sp: 1.000| Background_IOU: 0.913750, vessel_IOU: 0.000375
+epoch_batch: 6_1 | loss: 0.557671  | Acc: 0.895 | Se: 0.010 | Sp: 0.998| Background_IOU: 0.914853, vessel_IOU: 0.000157
+epoch_batch: 6_2 | loss: 0.564459  | Acc: 0.890 | Se: 0.000 | Sp: 0.999| Background_IOU: 0.911387, vessel_IOU: 0.000000
+epoch_batch: 6_3 | loss: 0.471290  | Acc: 0.917 | Se: 0.011 | Sp: 0.990| Background_IOU: 0.929066, vessel_IOU: 0.000170
+epoch_batch: 6_4 | loss: 0.548766  | Acc: 0.884 | Se: 0.000 | Sp: 1.000| Background_IOU: 0.901862, vessel_IOU: 0.000000

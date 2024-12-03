@@ -1,4 +1,3 @@
-
 from sklearn.metrics import roc_curve, auc
 import logging
 import torch
@@ -15,6 +14,8 @@ from core.utils import calculate_Accuracy, get_img_list, get_model, get_data
 from pylab import *
 import random
 import warnings
+
+from exp_logger import ExpLogger
 
 warnings.filterwarnings("ignore")
 torch.set_warn_always(False)
@@ -69,6 +70,8 @@ parser.add_argument("--gpu_available", type=str, default="3", help="the gpu used
 
 args = parser.parse_args()
 print(args)
+
+
 # --------------------------------------------------------------------------------
 # os.environ['CUDA_DEVICE_ORDER'] = "PCI_BUS_ID"
 # os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_available
@@ -99,9 +102,9 @@ def fast_test(model, args, img_list, model_name, logger):
             flag="test",
         )
         model.eval()
-        
+
         logger.info("fast_test path %s", path)
-        
+
         out, side_5, side_6, side_7, side_8 = model(img, imageGreys)
         out = torch.log(softmax_2d(side_8) + EPS)
 
@@ -129,7 +132,7 @@ def fast_test(model, args, img_list, model_name, logger):
         # Collect true labels and predicted scores for ROC AUC plot
         all_true_labels.extend(tmp_gt)
         all_pred_scores.extend(y_pred)
-        
+
         end = time.time()
 
         logger.info(
@@ -178,7 +181,7 @@ def fast_test(model, args, img_list, model_name, logger):
     # plt.close()
 
     # logger.info(f"ROC curve saved to {roc_plot_path}")
-    
+
     # # Generate ROC curve for the entire run
     # fpr, tpr, _ = roc_curve(all_true_labels, all_pred_scores, pos_label=255)
     # roc_auc = auc(fpr, tpr)
@@ -198,7 +201,6 @@ def fast_test(model, args, img_list, model_name, logger):
 
     # logger.info(f"AUC plot saved to {roc_plot_path}")
 
-
     # # Plot ROC curve
     # plt.figure()
     # plt.plot(fpr, tpr, color='blue', lw=2, label=f'ROC curve (AUC = {roc_auc:.2f})')
@@ -217,7 +219,6 @@ def fast_test(model, args, img_list, model_name, logger):
 
     # logger.info(f"ROC curve saved to {roc_plot_path}")
 
-
     # return np.mean(np.stack(Vessel_IOU))
     return np.mean(np.stack(ACC))
 
@@ -229,29 +230,14 @@ Dataset = dataset_list[args.datasetID]
 SubID = args.SubImageID
 model = get_model(model_name)
 
-log_file_path = r"%s/logs/%s_%s.log" % (RootDir, model_name, args.my_description)
-os.makedirs(os.path.dirname(log_file_path), exist_ok=True)  # Ensure the log directory exists
+argument_directory_base_path = os.path.join(
+    RootDir, f"model_name{model_name}_dataset{Dataset}_sub_id{SubID}_description{args.my_description}"
+)
 
-# Create a logger
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+os.makedirs(os.path.dirname(argument_directory_base_path), exist_ok=True)
 
-# File handler to log messages to a file
-file_handler = logging.FileHandler(log_file_path, mode='w')
-file_handler.setLevel(logging.INFO)
-
-# Console handler to logger.info messages to the console
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-
-# Formatter for consistent logging output
-formatter = logging.Formatter('')
-file_handler.setFormatter(formatter)
-console_handler.setFormatter(formatter)
-
-# Add handlers to the logger
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
+log_file_path = r"%s/logs/logger.log" % (argument_directory_base_path,)
+logger = ExpLogger(log_file_path)
 
 logger.info(f"Model Name: {model_name}")
 logger.info(f"Dataset: {Dataset}")
@@ -281,6 +267,10 @@ EPS = 1e-12
 # define path
 img_list = get_img_list(Dataset, SubID, flag="train")
 test_img_list = get_img_list(Dataset, SubID, flag="test")
+
+logger.info(f"model parameters : {str(model.parameters())}")
+
+
 optimizer = torch.optim.Adam(
     filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr
 )
@@ -298,10 +288,7 @@ IOU_best = 0
 logger.info("This model is %s_%s: " % (model_name, args.my_description) + "\n")
 logger.info("args: " + str(args) + "\n")
 logger.info(
-    "train lens: "
-    + str(len(img_list))
-    + " | test #lens: "
-    + str(len(test_img_list))
+    "train lens: " + str(len(img_list)) + " | test #lens: " + str(len(test_img_list))
 )
 logger.info("\n\n----------------------------------------#-----\n\n")
 
@@ -328,7 +315,7 @@ for epoch in range(args.epochs):
 
     model.train()
     begin_time = time.time()  # Record the start time for the current epoch
-    
+
     logger.info(
         "This model is %s_%s_%s_%s"
         % (model_name, args.n_class, args.img_size, args.my_description)
@@ -417,32 +404,48 @@ for epoch in range(args.epochs):
     if mean_accuracy > BestAccuracy:
         best_epoch = epoch
         BestAccuracy = mean_accuracy
-        torch.save(model.state_dict(), '%s/models/%s_%s_.pth' % (RootDir, model_name, args.my_description))
+        torch.save(
+            model.state_dict(),
+            "%s/models/%s_%s_.pth" % (RootDir, model_name, args.my_description),
+        )
         logger.info("Successfully saved the best model")
 
     logger.info("*" * 60 + "\n")
-    
+
 # After all epochs, create a PrettyTable to display the table
-t = PrettyTable(['Epoch', 'Average Accuracy', 'Loss', 'Sensitivity', 'Specificity', 'Background IOU', 'Vessel IOU'])
+t = PrettyTable(
+    [
+        "Epoch",
+        "Average Accuracy",
+        "Loss",
+        "Sensitivity",
+        "Specificity",
+        "Background IOU",
+        "Vessel IOU",
+    ]
+)
 
 # Add rows to the table for each epoch
 for epoch in range(args.epochs):
-    t.add_row([
-        epoch+1,
-        f"{epoch_accuracies[epoch]:.3f}",
-        f"{epoch_losses[epoch]:.3f}",
-        f"{epoch_se[epoch]:.3f}",
-        f"{epoch_sp[epoch]:.3f}",
-        f"{epoch_background_iou[epoch]:.3f}",
-        f"{epoch_vessel_iou[epoch]:.3f}"
-    ])
+    t.add_row(
+        [
+            epoch + 1,
+            f"{epoch_accuracies[epoch]:.3f}",
+            f"{epoch_losses[epoch]:.3f}",
+            f"{epoch_se[epoch]:.3f}",
+            f"{epoch_sp[epoch]:.3f}",
+            f"{epoch_background_iou[epoch]:.3f}",
+            f"{epoch_vessel_iou[epoch]:.3f}",
+        ]
+    )
 
 # Print the table
 logger.info("\nEpoch-wise Metrics:")
 logger.info(str(t))
 
 logger.info("\n\n")
-total_training_time = time.time() - total_start_time  # Total training time for all epochs
+total_training_time = (
+    time.time() - total_start_time
+)  # Total training time for all epochs
 logger.info("Model from Epoch %s was saved" % str(best_epoch))
 logger.info("Total training time: %.2f seconds" % total_training_time)
-

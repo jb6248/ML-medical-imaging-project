@@ -23,47 +23,55 @@ plt.switch_backend("agg")
 # --------------------------------------------------------------------------------
 
 models_list = ["DG_Net", "M_Net", "UNet512"]
-dataset_list = ['DRIVE', "STARE", "CHASEDB1"]
+dataset_list = ["DRIVE", "STARE", "CHASEDB1"]
 
 # --------------------------------------------------------------------------------
-parser = argparse.ArgumentParser(description='PyTorch ASOCT_Demo')
+parser = argparse.ArgumentParser(description="PyTorch ASOCT_Demo")
 # ---------------------------
 # params do not need to change
 # ---------------------------
-parser.add_argument('--epochs', type=int, default=250,
-                    help='the epochs of this run')
-parser.add_argument('--n_class', type=int, default=2,
-                    help='the channel of out img, decide the num of class, ASOCT_eyes is 2/4 class')
-parser.add_argument('--lr', type=float, default=0.0015,
-                    help='initial learning rate')
-parser.add_argument('--GroupNorm', type=bool, default=True,
-                    help='decide to use the GroupNorm')
-parser.add_argument('--BatchNorm', type=bool, default=False,
-                    help='decide to use the BatchNorm')
+parser.add_argument("--epochs", type=int, default=250, help="the epochs of this run")
+parser.add_argument(
+    "--n_class",
+    type=int,
+    default=2,
+    help="the channel of out img, decide the num of class, ASOCT_eyes is 2/4 class",
+)
+parser.add_argument("--lr", type=float, default=0.0015, help="initial learning rate")
+parser.add_argument(
+    "--GroupNorm", type=bool, default=True, help="decide to use the GroupNorm"
+)
+parser.add_argument(
+    "--BatchNorm", type=bool, default=False, help="decide to use the BatchNorm"
+)
 # ---------------------------
 # model
 # ---------------------------
-parser.add_argument('--datasetID', type=int, default=2,
-                    help='dir of the all img')
-parser.add_argument('--SubImageID', type=int, default=20,
-                    help='Only for Stare Dataset')
-parser.add_argument('--best_model', type=str, default='./data/32.pth',
-                    help='the pretrain model')
-parser.add_argument('--model_id', type=int, default=0,
-                    help='the id of choice_model in models_list')
-parser.add_argument('--batch_size', type=int, default=1,
-                    help='the num of img in a batch')
-parser.add_argument('--img_size', type=int, default=512,
-                    help='the train img size')
-parser.add_argument('--my_description', type=str, default='CHASEDB1',
-                    help='some description define your train')
+parser.add_argument("--datasetID", type=int, default=2, help="dir of the all img")
+parser.add_argument("--SubImageID", type=int, default=20, help="Only for Stare Dataset")
+parser.add_argument(
+    "--best_model", type=str, default="./data/32.pth", help="the pretrain model"
+)
+parser.add_argument(
+    "--model_id", type=int, default=0, help="the id of choice_model in models_list"
+)
+parser.add_argument(
+    "--batch_size", type=int, default=1, help="the num of img in a batch"
+)
+parser.add_argument("--img_size", type=int, default=512, help="the train img size")
+parser.add_argument(
+    "--my_description",
+    type=str,
+    default="CHASEDB1",
+    help="some description define your train",
+)
 # ---------------------------
 # GPU
 # ---------------------------
-parser.add_argument('--use_gpu', type=bool, default=False,
-                    help='dir of the all ori img')
-parser.add_argument('--gpu_avaiable', type=str, default='0',
-                    help='the gpu used')
+parser.add_argument(
+    "--use_gpu", type=bool, default=False, help="dir of the all ori img"
+)
+parser.add_argument("--gpu_avaiable", type=str, default="0", help="the gpu used")
 
 
 def fast_test(model, args, img_list, model_name, logger):
@@ -77,7 +85,7 @@ def fast_test(model, args, img_list, model_name, logger):
     SP = []
     AUC = []
 
-    ResultDir = './results'
+    ResultDir = "./results"
     FullResultDir = os.path.join(ResultDir, model_name)
     if not os.path.exists(FullResultDir):
         os.makedirs(FullResultDir)
@@ -101,9 +109,13 @@ def fast_test(model, args, img_list, model_name, logger):
     for i, path in enumerate(img_list):
 
         start = time.time()
-        img, imageGreys, gt, tmp_gt, img_shape, label_ori = get_data(dataset_list[args.datasetID], [path],
-                                                                     img_size=args.img_size, gpu=args.use_gpu,
-                                                                     flag='test')
+        img, imageGreys, gt, tmp_gt, img_shape, label_ori = get_data(
+            dataset_list[args.datasetID],
+            [path],
+            img_size=args.img_size,
+            gpu=args.use_gpu,
+            flag="test",
+        )
         end = time.time()
 
         model.eval()
@@ -113,7 +125,12 @@ def fast_test(model, args, img_list, model_name, logger):
         out_avg, side_5, side_6, side_7, side_8 = model(img, imageGreys)
 
         out = torch.log(softmax_2d(side_8) + EPS)
-        out = F.interpolate(out, size=(img_shape[0][0], img_shape[0][1]), mode='bilinear', align_corners=False)
+        out = F.interpolate(
+            out,
+            size=(img_shape[0][0], img_shape[0][1]),
+            mode="bilinear",
+            align_corners=False,
+        )
 
         out = out.cpu().data.numpy()
         y_pred = out[:, 1, :, :]
@@ -140,8 +157,10 @@ def fast_test(model, args, img_list, model_name, logger):
         background_iou.append(IU[0])
         vessel_iou.append(IU[1])
 
-        logger.info(f"Image: {i+1}/{len(img_list)}: | Acc: {Acc:.3f} | Se: {Se:.3f} | Sp: {Sp:.3f} | Auc: {Auc:.3f} "
-                    f"| Background_IOU: {IU[0]:.3f}, vessel_IOU: {IU[1]:.3f}  |  time: {end-start:.2f}s")
+        logger.info(
+            f"Image: {i+1}/{len(img_list)}: | Acc: {Acc:.3f} | Se: {Se:.3f} | Sp: {Sp:.3f} | Auc: {Auc:.3f} "
+            f"| Background_IOU: {IU[0]:.3f}, vessel_IOU: {IU[1]:.3f}  |  time: {end-start:.2f}s"
+        )
 
     # Calculate average values across the test set
     avg_acc = np.mean(ACC)
@@ -151,23 +170,37 @@ def fast_test(model, args, img_list, model_name, logger):
     avg_background_iou = np.mean(Background_IOU)
     avg_vessel_iou = np.mean(Vessel_IOU)
 
-    logger.info(f'Average Test Fast Values: Acc: {avg_acc:.3f} | Se: {avg_se:.3f} | '
-                f'Sp: {avg_sp:.3f} | Auc: {avg_auc:.3f} | Background_IOU: {avg_background_iou:.3f} | '
-                f'vessel_IOU: {avg_vessel_iou:.3f}')
+    logger.info(
+        f"Average Test Fast Values: Acc: {avg_acc:.3f} | Se: {avg_se:.3f} | "
+        f"Sp: {avg_sp:.3f} | Auc: {avg_auc:.3f} | Background_IOU: {avg_background_iou:.3f} | "
+        f"vessel_IOU: {avg_vessel_iou:.3f}"
+    )
 
     # Create a PrettyTable to display the metrics for the single epoch
-    t = PrettyTable(['Epoch', 'Average Accuracy', 'Loss', 'Sensitivity', 'Specificity', 'Background IOU', 'Vessel IOU'])
+    t = PrettyTable(
+        [
+            "Epoch",
+            "Average Accuracy",
+            "Loss",
+            "Sensitivity",
+            "Specificity",
+            "Background IOU",
+            "Vessel IOU",
+        ]
+    )
 
     # Add the single epoch metrics to the table
-    t.add_row([
-        1,  # Single epoch
-        f"{avg_acc:.3f}",
-        f"{np.mean(losses):.3f}",  # Average loss
-        f"{avg_se:.3f}",
-        f"{avg_sp:.3f}",
-        f"{avg_background_iou:.3f}",
-        f"{avg_vessel_iou:.3f}"
-    ])
+    t.add_row(
+        [
+            1,  # Single epoch
+            f"{avg_acc:.3f}",
+            f"{np.mean(losses):.3f}",  # Average loss
+            f"{avg_se:.3f}",
+            f"{avg_sp:.3f}",
+            f"{avg_background_iou:.3f}",
+            f"{avg_vessel_iou:.3f}",
+        ]
+    )
 
     # Print the table
     logger.info("\nEpoch-wise Metrics:")
@@ -176,25 +209,26 @@ def fast_test(model, args, img_list, model_name, logger):
     return np.mean(np.stack(ACC))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # os.environ['CUDA_DEVICE_ORDER'] = "PCI_BUS_ID"
     # os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_avaiable
-    
+
     args = parser.parse_args()
-    
+
     RootDir = os.getcwd()
     model_name = models_list[args.model_id]
-    
-    
+
     log_file_path = r"%s/logs/%s_%s.log" % (RootDir, model_name, args.my_description)
-    os.makedirs(os.path.dirname(log_file_path), exist_ok=True)  # Ensure the log directory exists
+    os.makedirs(
+        os.path.dirname(log_file_path), exist_ok=True
+    )  # Ensure the log directory exists
 
     # Create a logger
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
     # File handler to log messages to a file
-    file_handler = logging.FileHandler(log_file_path, mode='w')
+    file_handler = logging.FileHandler(log_file_path, mode="w")
     file_handler.setLevel(logging.INFO)
 
     # Console handler to logger.info messages to the console
@@ -202,7 +236,7 @@ if __name__ == '__main__':
     console_handler.setLevel(logging.INFO)
 
     # Formatter for consistent logging output
-    formatter = logging.Formatter('')
+    formatter = logging.Formatter("")
     file_handler.setFormatter(formatter)
     console_handler.setFormatter(formatter)
 
@@ -217,21 +251,21 @@ if __name__ == '__main__':
 
     if args.use_gpu:
         model.cuda()
-    #if False: 
+    # if False:
     if True:
-        #model_path = "/code/models/48.pth"
+        # model_path = "/code/models/48.pth"
         model_path = args.best_model
         # model.load_state_dict(torch.load(model_path))
         model.load_state_dict(torch.load(model_path, weights_only=True))
 
-        logger.info('success load models: %s' % (args.best_model))
+        logger.info("success load models: %s" % (args.best_model))
 
-    logger.info ('This model is %s_%s_%s' % (model_name, args.n_class, args.img_size))
+    logger.info("This model is %s_%s_%s" % (model_name, args.n_class, args.img_size))
     Dataset = dataset_list[args.datasetID]
     SubID = args.SubImageID
-    
-    test_img_list =  get_img_list(Dataset, SubID, flag='test')
-    
+
+    test_img_list = get_img_list(Dataset, SubID, flag="test")
+
     logger.info(f"Model Name: {model_name}")
     logger.info(f"Dataset: {Dataset}")
     logger.info("")  # Blank line for separation
@@ -246,6 +280,7 @@ if __name__ == '__main__':
     logger.info("")
     total_start_time = time.time()
     fast_test(model, args, test_img_list, model_name + args.my_description, logger)
-    total_testing_time = time.time() - total_start_time  # Total training time for all epochs
+    total_testing_time = (
+        time.time() - total_start_time
+    )  # Total training time for all epochs
     logger.info("Total testing time: %.1f seconds" % total_testing_time)
-
