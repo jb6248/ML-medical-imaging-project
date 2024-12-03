@@ -153,7 +153,8 @@ class DG_Net(nn.Module):
         self.side_8 = nn.Conv2d(32, n_classes, kernel_size=1, padding=0, stride=1, bias=True)
 
         #self.gf = SGGuidedFilter(r=2, eps=1e-2)
-        self.gf = GuidedFilter(r=2, eps=1e-2)
+        # self.gf = GuidedFilter(r=2, eps=1e-2)
+        self.gf = GuidedFilter(r=2, eps=1e-8) # CHANGED FROM DISCORD
 
     def forward(self, x, ImgGreys):
         _, _, img_shape, _ = x.size()

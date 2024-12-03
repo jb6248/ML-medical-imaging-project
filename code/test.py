@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from prettytable import PrettyTable
+import logging
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -12,8 +14,11 @@ import argparse
 import time
 from core.utils import calculate_Accuracy, get_model, get_data, get_img_list
 from pylab import *
+import warnings
 
-plt.switch_backend('agg')
+warnings.filterwarnings("ignore")
+torch.set_warn_always(False)
+plt.switch_backend("agg")
 
 # --------------------------------------------------------------------------------
 
@@ -59,10 +64,10 @@ parser.add_argument('--use_gpu', type=bool, default=False,
                     help='dir of the all ori img')
 parser.add_argument('--gpu_avaiable', type=str, default='0',
                     help='the gpu used')
-args = parser.parse_args()
 
-def fast_test(model, args, img_list, model_name):
-    softmax_2d = nn.Softmax2d()
+
+def fast_test(model, args, img_list, model_name, logger):
+    softmax_2d = torch.nn.Softmax2d()
     EPS = 1e-12
 
     Background_IOU = []
@@ -77,6 +82,22 @@ def fast_test(model, args, img_list, model_name):
     if not os.path.exists(FullResultDir):
         os.makedirs(FullResultDir)
 
+    accuracies = []
+    sensitivity_epoch = []
+    specificity_epoch = []
+    losses = []
+    background_iou = []
+    vessel_iou = []
+
+    # Lists to store metrics for the single epoch
+    epoch_accuracies = []
+    epoch_losses = []
+    epoch_se = []
+    epoch_sp = []
+    epoch_background_iou = []
+    epoch_vessel_iou = []
+
+    # Process the test images
     for i, path in enumerate(img_list):
 
         start = time.time()
@@ -92,16 +113,16 @@ def fast_test(model, args, img_list, model_name):
         out_avg, side_5, side_6, side_7, side_8 = model(img, imageGreys)
 
         out = torch.log(softmax_2d(side_8) + EPS)
-        out = F.upsample(out, size=(img_shape[0][0],img_shape[0][1]), mode='bilinear')
+        out = F.interpolate(out, size=(img_shape[0][0], img_shape[0][1]), mode='bilinear', align_corners=False)
+
         out = out.cpu().data.numpy()
-        #Write the corresponding result
-        y_pred =out[:,1,:,:]
+        y_pred = out[:, 1, :, :]
         y_pred = y_pred.reshape([-1])
         ppi = np.argmax(out, 1)
 
         tmp_out = ppi.reshape([-1])
-        tmp_gt=label_ori.reshape([-1])
-        tmp_gt[tmp_gt==255] = 1
+        tmp_gt = label_ori.reshape([-1])
+        tmp_gt[tmp_gt == 255] = 1
         my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)
         meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion)
         Auc = roc_auc_score(tmp_gt, y_pred)
@@ -113,24 +134,84 @@ def fast_test(model, args, img_list, model_name):
         SE.append(Se)
         SP.append(Sp)
 
+        accuracies.append(Acc)
+        sensitivity_epoch.append(Se)
+        specificity_epoch.append(Sp)
+        background_iou.append(IU[0])
+        vessel_iou.append(IU[1])
 
-        print(str(i+1)+r'/'+str(len(img_list))+': '+'| Acc: {:.3f} | Se: {:.3f} | Sp: {:.3f} | Auc: {:.3f} |  Background_IOU: {:f}, vessel_IOU: {:f}'.format(Acc,Se,Sp,Auc,IU[0], IU[1])+'  |  time:%s'%(end-start))
+        logger.info(f"Image: {i+1}/{len(img_list)}: | Acc: {Acc:.3f} | Se: {Se:.3f} | Sp: {Sp:.3f} | Auc: {Auc:.3f} "
+                    f"| Background_IOU: {IU[0]:.3f}, vessel_IOU: {IU[1]:.3f}  |  time: {end-start:.2f}s")
 
-    print('Acc: %s  |  Se: %s |  Sp: %s |  Auc: %s |  Background_IOU: %s |  vessel_IOU: %s '%(str(np.mean(np.stack(ACC))),str(np.mean(np.stack(SE))), str(np.mean(np.stack(SP))),str(np.mean(np.stack(AUC))),str(np.mean(np.stack(Background_IOU))),str(np.mean(np.stack(Vessel_IOU)))))
+    # Calculate average values across the test set
+    avg_acc = np.mean(ACC)
+    avg_se = np.mean(SE)
+    avg_sp = np.mean(SP)
+    avg_auc = np.mean(AUC)
+    avg_background_iou = np.mean(Background_IOU)
+    avg_vessel_iou = np.mean(Vessel_IOU)
 
-    # store test information
-#    with open(r'./logs/%s_%s.txt' % (model_name, args.my_description), 'a+') as f:
-#        f.write('Acc: %s  |  Se: %s |  Sp: %s |  Auc: %s |  Background_IOU: %s |  #vessel_IOU: %s '%(str(np.mean(np.stack(ACC))),str(np.mean(np.stack(SE))), #str(np.mean(np.stack(SP))),str(np.mean(np.stack(AUC))),str(np.mean(np.stack(Backgr#ound_IOU))),str(np.mean(np.stack(Vessel_IOU)))))
-#        f.write('\n\n')
+    logger.info(f'Average Test Fast Values: Acc: {avg_acc:.3f} | Se: {avg_se:.3f} | '
+                f'Sp: {avg_sp:.3f} | Auc: {avg_auc:.3f} | Background_IOU: {avg_background_iou:.3f} | '
+                f'vessel_IOU: {avg_vessel_iou:.3f}')
 
-    #return np.mean(np.stack(Vessel_IOU))
+    # Create a PrettyTable to display the metrics for the single epoch
+    t = PrettyTable(['Epoch', 'Average Accuracy', 'Loss', 'Sensitivity', 'Specificity', 'Background IOU', 'Vessel IOU'])
+
+    # Add the single epoch metrics to the table
+    t.add_row([
+        1,  # Single epoch
+        f"{avg_acc:.3f}",
+        f"{np.mean(losses):.3f}",  # Average loss
+        f"{avg_se:.3f}",
+        f"{avg_sp:.3f}",
+        f"{avg_background_iou:.3f}",
+        f"{avg_vessel_iou:.3f}"
+    ])
+
+    # Print the table
+    logger.info("\nEpoch-wise Metrics:")
+    logger.info(str(t))
+
     return np.mean(np.stack(ACC))
 
-if __name__ == '__main__':
-    os.environ['CUDA_DEVICE_ORDER'] = "PCI_BUS_ID"
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_avaiable
 
+if __name__ == '__main__':
+    # os.environ['CUDA_DEVICE_ORDER'] = "PCI_BUS_ID"
+    # os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_avaiable
+    
+    args = parser.parse_args()
+    
+    RootDir = os.getcwd()
     model_name = models_list[args.model_id]
+    
+    
+    log_file_path = r"%s/logs/%s_%s.log" % (RootDir, model_name, args.my_description)
+    os.makedirs(os.path.dirname(log_file_path), exist_ok=True)  # Ensure the log directory exists
+
+    # Create a logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    # File handler to log messages to a file
+    file_handler = logging.FileHandler(log_file_path, mode='w')
+    file_handler.setLevel(logging.INFO)
+
+    # Console handler to logger.info messages to the console
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+
+    # Formatter for consistent logging output
+    formatter = logging.Formatter('')
+    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(formatter)
+
+    # Add handlers to the logger
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
+    logger.info(args)
+
     model = get_model(model_name)
     model = model(n_classes=args.n_class, bn=args.GroupNorm, BatchNorm=args.BatchNorm)
 
@@ -140,11 +221,31 @@ if __name__ == '__main__':
     if True:
         #model_path = "/code/models/48.pth"
         model_path = args.best_model
-        model.load_state_dict(torch.load(model_path))
-        print('success load models: %s_%s' % (model_name, args.my_description))
+        # model.load_state_dict(torch.load(model_path))
+        model.load_state_dict(torch.load(model_path, weights_only=True))
 
-    print ('This model is %s_%s_%s' % (model_name, args.n_class, args.img_size))
+        logger.info('success load models: %s' % (args.best_model))
+
+    logger.info ('This model is %s_%s_%s' % (model_name, args.n_class, args.img_size))
     Dataset = dataset_list[args.datasetID]
     SubID = args.SubImageID
+    
     test_img_list =  get_img_list(Dataset, SubID, flag='test')
-    fast_test(model, args, test_img_list, model_name + args.my_description)
+    
+    logger.info(f"Model Name: {model_name}")
+    logger.info(f"Dataset: {Dataset}")
+    logger.info("")  # Blank line for separation
+    logger.info(f"SubImage ID: {SubID}")
+    logger.info(f"Model: {model}")
+
+    logger.info(
+        "This model is %s_%s_%s_%s"
+        % (model_name, args.n_class, args.img_size, args.my_description)
+    )
+
+    logger.info("")
+    total_start_time = time.time()
+    fast_test(model, args, test_img_list, model_name + args.my_description, logger)
+    total_testing_time = time.time() - total_start_time  # Total training time for all epochs
+    logger.info("Total testing time: %.1f seconds" % total_testing_time)
+
