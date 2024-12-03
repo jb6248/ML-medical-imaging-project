@@ -15,7 +15,7 @@ from pylab import *
 import random
 import warnings
 
-from exp_logger import ExpLogger
+from experiment_code.exp_logger import ExpLogger
 
 warnings.filterwarnings("ignore")
 torch.set_warn_always(False)
@@ -231,7 +231,8 @@ SubID = args.SubImageID
 model = get_model(model_name)
 
 argument_directory_base_path = os.path.join(
-    RootDir, f"model_name{model_name}_dataset{Dataset}_sub_id{SubID}_description{args.my_description}"
+    RootDir,
+    f"model_name{model_name}_dataset{Dataset}_sub_id{SubID}_description{args.my_description}",
 )
 
 os.makedirs(os.path.dirname(argument_directory_base_path), exist_ok=True)

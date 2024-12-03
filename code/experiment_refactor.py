@@ -1,5 +1,5 @@
 from prettytable import PrettyTable
-from exp_logger import ExpLogger
+from experiment_code.exp_logger import ExpLogger
 from sklearn.metrics import roc_curve, auc
 import logging
 import torch
