@@ -31,3 +31,10 @@ class ExpLogger:
 
     def info(self, msg):
         self.logger.info(msg)
+
+    def close(self):
+        # Close the file and console handlers to stop logging
+        self.logger.removeHandler(self.file_handler)
+        self.logger.removeHandler(self.console_handler)
+        self.file_handler.close()
+        self.console_handler.close()

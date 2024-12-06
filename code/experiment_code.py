@@ -234,21 +234,21 @@ def main():
     )
 
     log_file_path = os.path.join(argument_directory_base_path, "logger_train.log")
-    logger = ExpLogger(log_file_path)
+    train_logger = ExpLogger(log_file_path)
 
-    logger.info(f"argument_directory_base_path_train: {argument_directory_base_path}")
-    logger.info(f"log_file_path: {log_file_path}")
-    logger.info(f"model name: {model_name}")
-    logger.info(f"dataset: {dataset}")
-    logger.info(f"sub image ID: {sub_id}")
-    logger.info(f"model: {model}")
+    train_logger.info(f"argument_directory_base_path_train: {argument_directory_base_path}")
+    train_logger.info(f"log_file_path: {log_file_path}")
+    train_logger.info(f"model name: {model_name}")
+    train_logger.info(f"dataset: {dataset}")
+    train_logger.info(f"sub image ID: {sub_id}")
+    train_logger.info(f"model: {model}")
 
-    logger.info(
+    train_logger.info(
         "This model is %s_%s_%s_%s"
         % (model_name, args.n_class, args.img_size, args.my_description)
     )
 
-    logger.info(str(args))
+    train_logger.info(str(args))
 
     EPS_BASELINE = 1e-8
     R_BASELINE = 2
@@ -262,15 +262,15 @@ def main():
         eps=EPS_BASELINE,
     )
 
-    logger.info("")
+    train_logger.info("")
     if torch.cuda.device_count() > 1:
-        logger.info("Let's use", torch.cuda.device_count(), "GPUs!")
+        train_logger.info("Let's use", torch.cuda.device_count(), "GPUs!")
         model = nn.DataParallel(model)
 
     if args.use_gpu:
         model.cuda()
-        logger.info("GPUs used: (%s)" % args.gpu_available)
-        logger.info("------- success use GPU --------")
+        train_logger.info("GPUs used: (%s)" % args.gpu_available)
+        train_logger.info("------- success use GPU --------")
 
     # Get image list for training and testing
     train_img_list = get_img_list(dataset, sub_id, flag="train")
@@ -284,7 +284,7 @@ def main():
 
     # Run training experiment
     train_experiement(
-        logger,
+        train_logger,
         argument_directory_base_path,
         args,
         model,
@@ -297,31 +297,34 @@ def main():
         R_BASELINE,
         optimizer,
     )
+    
+    train_logger.close()
 
     # After training, load the best model for testing
     test_model = get_model(model_name)
     test_model = test_model(
         n_classes=args.n_class, bn=args.GroupNorm, BatchNorm=args.BatchNorm
     )
+    
+    test_log_file_path = os.path.join(argument_directory_base_path, "logger_test.log")
+    test_logger = ExpLogger(test_log_file_path)
 
-    logger.info("")
+    test_logger.info("")
     if torch.cuda.device_count() > 1:
-        logger.info("Let's use", torch.cuda.device_count(), "GPUs!")
+        test_logger.info("Let's use", torch.cuda.device_count(), "GPUs!")
         test_model = nn.DataParallel(test_model)
 
     if args.use_gpu:
         test_model.cuda()
-        logger.info("GPUs used: (%s)" % args.gpu_available)
-        logger.info("------- success use GPU --------")
+        test_logger.info("GPUs used: (%s)" % args.gpu_available)
+        test_logger.info("------- success use GPU --------")
+    
+    # Set up logger for testing
 
     # Load the best trained model weights for testing
     test_model_path = os.path.join(argument_directory_base_path, "best_train_model.pth")
     test_model.load_state_dict(torch.load(test_model_path, weights_only=True))
-    logger.info(f"success loading test model: {test_model_path}")
-
-    # Set up logger for testing
-    test_log_file_path = os.path.join(argument_directory_base_path, "logger_test.log")
-    test_logger = ExpLogger(test_log_file_path)
+    test_logger.info(f"success loading test model: {test_model_path}")
 
     test_logger.info(f"test_model_path: {test_model_path}")
 
