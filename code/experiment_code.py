@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from exp_train import train_experiement
-from exp_test import fast_test
+from exp_test import test_experiment
 import matplotlib.pyplot as plt
 
 import argparse
@@ -80,6 +80,143 @@ def parse_args():
 
 # RUN THE CODE AT THE ROOT DIRECTORY PATH
 # {RIT_USERNAME}@{SERVER{}:~/ML-medical-imaging-project$
+# def main():
+#     args = parse_args()
+
+#     root_dir = "./experiment_runs/"
+#     model_name = models_list[args.model_id]
+#     dataset = dataset_list[args.datasetID]
+#     sub_id = args.SubImageID
+#     model = get_model(
+#         model_name
+#     )  # Ensure this returns an instantiated model, not a class.
+
+#     argument_directory_base_path = os.path.join(
+#         root_dir,
+#         f"model_name{model_name}_dataset{dataset}_sub_id{sub_id}_description{args.my_description}_epochs{args.epochs}",
+#     )
+
+#     # argument_directory_base_path_train = os.path.join(
+#     #     argument_directory_base_path, "train"
+#     # )
+#     # os.makedirs(argument_directory_base_path_train, exist_ok=True)
+
+#     log_file_path = os.path.join(argument_directory_base_path, "logger_train.log")
+#     logger = ExpLogger(log_file_path)
+
+#     logger.info(
+#         f"argument_directory_base_path_train: {argument_directory_base_path}"
+#     )
+#     logger.info(f"log_file_path: {log_file_path}")
+#     logger.info(f"model name: {model_name}")
+#     logger.info(f"dataset: {dataset}")
+#     logger.info(f"sub image ID: {sub_id}")
+#     logger.info(f"model: {model}")
+
+#     logger.info(
+#         "This model is %s_%s_%s_%s"
+#         % (model_name, args.n_class, args.img_size, args.my_description)
+#     )
+
+#     logger.info(str(args))
+
+#     EPS_BASELINE = 1e-8
+#     R_BASELINE = 2
+
+#     model = model(
+#         n_classes=args.n_class,
+#         bn=args.GroupNorm,
+#         BatchNorm=args.BatchNorm,
+#         r=R_BASELINE,
+#         eps=EPS_BASELINE,
+#     )
+
+#     logger.info("")
+#     if torch.cuda.device_count() > 1:
+#         logger.info("Let's use", torch.cuda.device_count(), "GPUs!")
+#         model = nn.DataParallel(model)
+
+#     if args.use_gpu:
+#         model.cuda()
+#         logger.info("GPUs used: (%s)" % args.gpu_available)
+#         logger.info("------- success use GPU --------")
+
+#     train_img_list = get_img_list(dataset, sub_id, flag="train")
+#     test_img_list = get_img_list(dataset, sub_id, flag="test")
+
+#     optimizer = torch.optim.Adam(
+#         filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr
+#     )
+#     criterion = nn.NLLLoss2d()
+#     softmax_2d = nn.Softmax2d()
+
+#     # RUN THE BASELINE
+#     train_experiement(
+#         logger,
+#         argument_directory_base_path,
+#         args,
+#         model,
+#         model_name,
+#         train_img_list,
+#         criterion,
+#         dataset,
+#         softmax_2d,
+#         EPS_BASELINE,
+#         R_BASELINE,
+#         optimizer,
+#     )
+
+#     test_model = get_model(model_name)
+#     test_model = test_model(
+#         n_classes=args.n_class, bn=args.GroupNorm, BatchNorm=args.BatchNorm
+#     )
+
+#     if args.use_gpu:
+#         model.cuda()
+    
+    
+#     test_model_path = os.path.join(argument_directory_base_path, "best_train_model.pth")
+#     model.load_state_dict(torch.load(test_model_path, weights_only=True))
+#     logger.info("success load models: %s" % (test_model_path))
+
+#     test_log_file_path = os.path.join(
+#         argument_directory_base_path, "logger_test.log"
+#     )
+#     test_logger = ExpLogger(test_log_file_path)
+
+#     test_logger.info(f"test_model_path: {test_model_path}")
+
+#     test_accuracy_mean = test_experiment(model, args, test_img_list, model_name + args.my_description, logger)
+
+#     sys.exit(0)
+
+#     EPS_WINDOW = [1e-10, 1e-9, 1e-8, 1e-7, 1e-6]
+#     R_WINDOW = [0, 1, 2, 3, 4]
+
+#     for eps in EPS_WINDOW:
+#         for r in R_WINDOW:
+#             model = model(
+#                 n_classes=args.n_class,
+#                 bn=args.GroupNorm,
+#                 BatchNorm=args.BatchNorm,
+#                 r=r,
+#                 eps=eps,
+#             )
+
+#             train(
+#                 logger,
+#                 argument_directory_base_path,
+#                 args,
+#                 model,
+#                 model_name,
+#                 train_img_list,
+#                 criterion,
+#                 dataset,
+#                 softmax_2d,
+#                 eps,
+#                 r,
+#             )
+
 def main():
     args = parse_args()
 
@@ -93,20 +230,13 @@ def main():
 
     argument_directory_base_path = os.path.join(
         root_dir,
-        f"model_name{model_name}_dataset{dataset}_sub_id{sub_id}_description{args.my_description}",
+        f"model_name{model_name}_dataset{dataset}_sub_id{sub_id}_description{args.my_description}_epochs{args.epochs}",
     )
-
-    # argument_directory_base_path_train = os.path.join(
-    #     argument_directory_base_path, "train"
-    # )
-    # os.makedirs(argument_directory_base_path_train, exist_ok=True)
 
     log_file_path = os.path.join(argument_directory_base_path, "logger_train.log")
     logger = ExpLogger(log_file_path)
 
-    logger.info(
-        f"argument_directory_base_path_train: {argument_directory_base_path}"
-    )
+    logger.info(f"argument_directory_base_path_train: {argument_directory_base_path}")
     logger.info(f"log_file_path: {log_file_path}")
     logger.info(f"model name: {model_name}")
     logger.info(f"dataset: {dataset}")
@@ -123,6 +253,7 @@ def main():
     EPS_BASELINE = 1e-8
     R_BASELINE = 2
 
+    # Initialize model for training
     model = model(
         n_classes=args.n_class,
         bn=args.GroupNorm,
@@ -141,6 +272,7 @@ def main():
         logger.info("GPUs used: (%s)" % args.gpu_available)
         logger.info("------- success use GPU --------")
 
+    # Get image list for training and testing
     train_img_list = get_img_list(dataset, sub_id, flag="train")
     test_img_list = get_img_list(dataset, sub_id, flag="test")
 
@@ -150,8 +282,8 @@ def main():
     criterion = nn.NLLLoss2d()
     softmax_2d = nn.Softmax2d()
 
-    # RUN THE BASELINE
-    test_model_path = train_experiement(
+    # Run training experiment
+    train_experiement(
         logger,
         argument_directory_base_path,
         args,
@@ -166,60 +298,37 @@ def main():
         optimizer,
     )
 
+    # After training, load the best model for testing
     test_model = get_model(model_name)
     test_model = test_model(
         n_classes=args.n_class, bn=args.GroupNorm, BatchNorm=args.BatchNorm
     )
 
+    logger.info("")
+    if torch.cuda.device_count() > 1:
+        logger.info("Let's use", torch.cuda.device_count(), "GPUs!")
+        test_model = nn.DataParallel(test_model)
+
     if args.use_gpu:
-        model.cuda()
-    # if False:
-    if True:
-        model.load_state_dict(torch.load(test_model_path, weights_only=True))
-        logger.info("success load models: %s" % (test_model_path))
+        test_model.cuda()
+        logger.info("GPUs used: (%s)" % args.gpu_available)
+        logger.info("------- success use GPU --------")
 
-    argument_directory_base_path_test = os.path.join(
-        argument_directory_base_path, "test"
-    )
-    os.makedirs(argument_directory_base_path_test, exist_ok=True)
+    # Load the best trained model weights for testing
+    test_model_path = os.path.join(argument_directory_base_path, "best_train_model.pth")
+    test_model.load_state_dict(torch.load(test_model_path, weights_only=True))
+    logger.info(f"success loading test model: {test_model_path}")
 
-    test_log_file_path = os.path.join(
-        argument_directory_base_path_test, "logger_test.log"
-    )
+    # Set up logger for testing
+    test_log_file_path = os.path.join(argument_directory_base_path, "logger_test.log")
     test_logger = ExpLogger(test_log_file_path)
 
     test_logger.info(f"test_model_path: {test_model_path}")
 
-    fast_test(model, args, test_img_list, model_name + args.my_description, logger)
+    # Run the testing experiment
+    test_accuracy_mean = test_experiment(test_model, args, test_img_list, model_name + args.my_description, test_logger)
+    test_logger.info(f"Test accuracy: {test_accuracy_mean}")
 
-    sys.exit(0)
-
-    EPS_WINDOW = [1e-10, 1e-9, 1e-8, 1e-7, 1e-6]
-    R_WINDOW = [0, 1, 2, 3, 4]
-
-    for eps in EPS_WINDOW:
-        for r in R_WINDOW:
-            model = model(
-                n_classes=args.n_class,
-                bn=args.GroupNorm,
-                BatchNorm=args.BatchNorm,
-                r=r,
-                eps=eps,
-            )
-
-            train(
-                logger,
-                argument_directory_base_path,
-                args,
-                model,
-                model_name,
-                train_img_list,
-                criterion,
-                dataset,
-                softmax_2d,
-                eps,
-                r,
-            )
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ plt.switch_backend("agg")
 
 def train_experiement(
     logger,
-    base_path,
+    argument_directory_base_path,
     args,
     model,
     model_name,
@@ -40,8 +40,6 @@ def train_experiement(
     epoch_sp = []
     epoch_background_iou = []
     epoch_vessel_iou = []
-
-    model_file_path = None
 
     for epoch in range(args.epochs):
         logger.info("#" * 20 + f" EPOCH #{epoch + 1} " + "#" * 20)
@@ -141,7 +139,7 @@ def train_experiement(
         if mean_accuracy > best_epoch_accuracy:
             best_epoch_number = epoch
             best_epoch_accuracy = mean_accuracy
-            model_file_path = os.path.join(base_path, "best_train_model.pth")
+            model_file_path = os.path.join(argument_directory_base_path, "best_train_model.pth")
             os.makedirs(os.path.dirname(model_file_path), exist_ok=True)
             torch.save(model.state_dict(), model_file_path)
             logger.info("Successfully saved the best model")
@@ -186,4 +184,3 @@ def train_experiement(
     logger.info("Model from Epoch %s was saved" % str(best_epoch_number))
     logger.info("Total training time: %.2f seconds" % total_training_time)
 
-    return model_file_path
