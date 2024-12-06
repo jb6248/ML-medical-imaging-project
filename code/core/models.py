@@ -6,7 +6,7 @@ import cv2
 from .FastGuidedFilter import GuidedFilter
 
 class M_Net(nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False):
+    def __init__(self, n_classes, bn=True, BatchNorm=False,r=None, eps=None):
         super(M_Net, self).__init__()
 
         # mutli-scale simple convolution
@@ -69,7 +69,7 @@ class M_Net(nn.Module):
         return [ave_out, side_5, side_6, side_7, side_8]
 
 class UNet512 (nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False):
+    def __init__(self, n_classes, bn=True, BatchNorm=False,r=None, eps=None):
         super(UNet512, self).__init__()
 
         #1024
@@ -113,7 +113,7 @@ class UNet512 (nn.Module):
         return [out, out, out, out, out]
 
 class DG_Net(nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False):
+    def __init__(self, n_classes, bn=True, BatchNorm=False, r=2, eps=1e-8):
         super(DG_Net, self).__init__()
 
         # mutli-scale simple convolution
@@ -153,7 +153,8 @@ class DG_Net(nn.Module):
         self.side_8 = nn.Conv2d(32, n_classes, kernel_size=1, padding=0, stride=1, bias=True)
 
         #self.gf = SGGuidedFilter(r=2, eps=1e-2)
-        self.gf = GuidedFilter(r=2, eps=1e-2)
+        # self.gf = GuidedFilter(r=2, eps=1e-2)
+        self.gf = GuidedFilter(r, eps) # CHANGED FROM DISCORD
 
     def forward(self, x, ImgGreys):
         _, _, img_shape, _ = x.size()
