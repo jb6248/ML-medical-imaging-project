@@ -21,7 +21,7 @@ class ExpLogger:
         self.console_handler.setLevel(logging.INFO)
 
         # Formatter for consistent logging output
-        self.formatter = logging.Formatter('')
+        self.formatter = logging.Formatter("")
         self.file_handler.setFormatter(self.formatter)
         self.console_handler.setFormatter(self.formatter)
 

@@ -19,9 +19,9 @@ plt.switch_backend("agg")
 dataset_list = ["DRIVE", "STARE", "CHASEDB1"]
 
 
+EPS = 1e-12
 def test_experiment(model, args, img_list, model_name, logger):
     softmax_2d = nn.Softmax2d()
-    EPS = 1e-12
 
     Background_IOU = []
     Vessel_IOU = []
@@ -98,6 +98,7 @@ def test_experiment(model, args, img_list, model_name, logger):
     )
 
     return np.mean(np.stack(ACC))
+
 
 # import sys
 

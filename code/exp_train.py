@@ -16,6 +16,9 @@ torch.set_warn_always(False)
 plt.switch_backend("agg")
 
 
+PAPER_EPS = 1e-12
+
+
 def train_experiement(
     logger,
     argument_directory_base_path,
@@ -26,8 +29,6 @@ def train_experiement(
     criterion,
     dataset,
     softmax_2d,
-    EPS,
-    R,
     optimizer,
 ):
     total_start_time = time.time()
@@ -80,13 +81,13 @@ def train_experiement(
             out, side_5, side_6, side_7, side_8 = model(img, imageGreys)
 
             # Loss calculation
-            out = torch.log(softmax_2d(out) + EPS)
+            out = torch.log(softmax_2d(out) + PAPER_EPS)
             loss = criterion(out, gt)
-            loss += criterion(torch.log(softmax_2d(side_5) + EPS), gt)
-            loss += criterion(torch.log(softmax_2d(side_6) + EPS), gt)
-            loss += criterion(torch.log(softmax_2d(side_7) + EPS), gt)
-            loss += criterion(torch.log(softmax_2d(side_8) + EPS), gt)
-            out = torch.log(softmax_2d(side_8) + EPS)
+            loss += criterion(torch.log(softmax_2d(side_5) + PAPER_EPS), gt)
+            loss += criterion(torch.log(softmax_2d(side_6) + PAPER_EPS), gt)
+            loss += criterion(torch.log(softmax_2d(side_7) + PAPER_EPS), gt)
+            loss += criterion(torch.log(softmax_2d(side_8) + PAPER_EPS), gt)
+            out = torch.log(softmax_2d(side_8) + PAPER_EPS)
 
             loss.backward()
             optimizer.step()
@@ -139,7 +140,9 @@ def train_experiement(
         if mean_accuracy > best_epoch_accuracy:
             best_epoch_number = epoch
             best_epoch_accuracy = mean_accuracy
-            model_file_path = os.path.join(argument_directory_base_path, "best_train_model.pth")
+            model_file_path = os.path.join(
+                argument_directory_base_path, "best_train_model.pth"
+            )
             os.makedirs(os.path.dirname(model_file_path), exist_ok=True)
             torch.save(model.state_dict(), model_file_path)
             logger.info("Successfully saved the best model")
@@ -183,4 +186,3 @@ def train_experiement(
     )  # Total training time for all epochs
     logger.info("Model from Epoch %s was saved" % str(best_epoch_number))
     logger.info("Total training time: %.2f seconds" % total_training_time)
-
