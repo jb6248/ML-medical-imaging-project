@@ -128,6 +128,9 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     clear_directory(window_path)
     os.makedirs(window_path, exist_ok=True)
     
+    debugimages_path = os.path.join(base_path, f"window_eps_{eps}_r_{r}/debugimages")
+    os.makedirs(debugimages_path, exist_ok=True)
+    
     log_file_path = os.path.join(window_path, "logger_train.log")
     train_logger = create_logger(log_file_path)
     
@@ -140,7 +143,7 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     softmax_2d = nn.Softmax2d()
 
     # Training experiment
-    train_experiement(train_logger, window_path, args, model, model_name, train_img_list, criterion, dataset, softmax_2d, optimizer)
+    train_experiement(train_logger, window_path, args, model, model_name, train_img_list, criterion, dataset, softmax_2d, optimizer, debugimages_path)
     train_logger.close()
 
     # Testing

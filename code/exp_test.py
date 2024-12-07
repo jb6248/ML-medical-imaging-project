@@ -58,7 +58,7 @@ def test_experiment(model, args, img_list, model_name, logger):
         tmp_gt = label_ori.reshape([-1])
 
         my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)
-        meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion)
+        meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion, logger, debug=True)
         Auc = roc_auc_score(tmp_gt, y_pred)
         AUC.append(Auc)
 

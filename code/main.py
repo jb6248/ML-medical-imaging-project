@@ -137,9 +137,6 @@ def fast_test(model, args, img_list, model_name, logger):
         all_true_labels.extend(tmp_gt)
         all_pred_scores.extend(y_pred)
 
-<<<<<<< HEAD
-        end = time.time()
-=======
     dry = 'Acc: %s  |  Se: %s |  Sp: %s |  Auc: %s |  Background_IOU: %s |  vessel_IOU: %s '%(str(np.mean(np.stack(ACC))),str(np.mean(np.stack(SE))), str(np.mean(np.stack(SP))),str(np.mean(np.stack(AUC))),str(np.mean(np.stack(Background_IOU))),str(np.mean(np.stack(Vessel_IOU))))
     print(dry)
 
@@ -147,7 +144,6 @@ def fast_test(model, args, img_list, model_name, logger):
     with open(r'./logs/%s_%s.txt' % (model_name, args.my_description), 'a+') as f:
         f.write(dry)
         f.write('\n\n')
->>>>>>> origin/v1
 
         logger.info(
             str(i + 1)
@@ -341,29 +337,6 @@ for epoch in range(args.epochs):
         args.lr /= 10
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
-<<<<<<< HEAD
-    accuracies = []
-    sensitivity_epoch = []
-    specificity_epoch = []
-    losses = []
-    background_iou = []
-    vessel_iou = []
-
-    for i, (start, end) in enumerate(
-        zip(
-            range(0, len(img_list), args.batch_size),
-            range(args.batch_size, len(img_list) + args.batch_size, args.batch_size),
-        )
-    ):
-        path = img_list[start:end]
-        img, imageGreys, gt, tmp_gt, img_shape, label_ori = get_data(
-            Dataset, path, img_size=args.img_size, gpu=args.use_gpu
-        )
-        optimizer.zero_grad()
-        out, side_5, side_6, side_7, side_8 = model(img, imageGreys)
-
-        # Loss calculation
-=======
     for i, (start, end) in enumerate(zip(range(0, len(img_list), args.batch_size),
                                          range(args.batch_size, len(img_list) + args.batch_size,
                                                args.batch_size))):
@@ -386,7 +359,6 @@ for epoch in range(args.epochs):
             outimg = np.array(outimg, dtype=np.uint8)
             output_debug_image(outimg, f'output_{epoch}_{i}.png')
 
->>>>>>> origin/v1
         out = torch.log(softmax_2d(out) + EPS)
         loss = criterion(out, gt)
         loss += criterion(torch.log(softmax_2d(side_5) + EPS), gt)
@@ -405,92 +377,6 @@ for epoch in range(args.epochs):
         my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)
 
         meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion)
-<<<<<<< HEAD
-        accuracies.append(Acc)
-        sensitivity_epoch.append(Se)
-        specificity_epoch.append(Sp)
-        background_iou.append(IU[0])
-        vessel_iou.append(IU[1])
-        losses.append(loss.item())
-
-        logger.info(
-            str(
-                "epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} | Se: {:.3f} | Sp: {:.3f}"
-                "| Background_IOU: {:f}, vessel_IOU: {:f}"
-            ).format(
-                epoch,
-                i,
-                loss.item(),
-                Acc,
-                Se,
-                Sp,
-                IU[0],
-                IU[1],
-            )
-        )
-
-    epoch_time = time.time() - begin_time  # Calculate the time for the current epoch
-    logger.info("Epoch finished, time: %.1f s" % epoch_time)
-    mean_accuracy = np.mean(accuracies)
-    logger.info("Mean accuracy %s" % str(mean_accuracy))
-
-    # Store the values for this epoch
-    epoch_accuracies.append(mean_accuracy)
-    epoch_losses.append(np.mean(losses))
-    epoch_se.append(np.mean(sensitivity_epoch))
-    epoch_sp.append(np.mean(specificity_epoch))
-    epoch_background_iou.append(np.mean(background_iou))
-    epoch_vessel_iou.append(np.mean(vessel_iou))
-
-    if mean_accuracy > BestAccuracy:
-        best_epoch = epoch
-        BestAccuracy = mean_accuracy
-        torch.save(
-            model.state_dict(),
-            "%s/models/%s_%s_.pth" % (RootDir, model_name, args.my_description),
-        )
-        logger.info("Successfully saved the best model")
-
-    logger.info("*" * 60 + "\n")
-
-# After all epochs, create a PrettyTable to display the table
-t = PrettyTable(
-    [
-        "Epoch",
-        "Average Accuracy",
-        "Loss",
-        "Sensitivity",
-        "Specificity",
-        "Background IOU",
-        "Vessel IOU",
-    ]
-)
-
-# Add rows to the table for each epoch
-for epoch in range(args.epochs):
-    t.add_row(
-        [
-            epoch + 1,
-            f"{epoch_accuracies[epoch]:.3f}",
-            f"{epoch_losses[epoch]:.3f}",
-            f"{epoch_se[epoch]:.3f}",
-            f"{epoch_sp[epoch]:.3f}",
-            f"{epoch_background_iou[epoch]:.3f}",
-            f"{epoch_vessel_iou[epoch]:.3f}",
-        ]
-    )
-
-# Print the table
-logger.info("\nEpoch-wise Metrics:")
-logger.info(str(t))
-
-logger.info("\n\n")
-total_training_time = (
-    time.time() - total_start_time
-)  # Total training time for all epochs
-logger.info("Model from Epoch %s was saved" % str(best_epoch))
-logger.info("Total training time: %.2f seconds" % total_training_time)
-=======
 
         print(str('model: {:s}_{:s} | epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} | Se: {:.3f} | Sp: {:.3f}'
                   '| Background_IOU: {:f}, vessel_IOU: {:f}').format(model_name, args.my_description,epoch, i, loss.item(), Acc,Se,Sp,
@@ -510,4 +396,3 @@ logger.info("Total training time: %.2f seconds" % total_training_time)
                        os.path.join(directory, '%s.pth' % str(epoch)))
             # For evaluation
             print('success save Nucleus_best model')
->>>>>>> origin/v1

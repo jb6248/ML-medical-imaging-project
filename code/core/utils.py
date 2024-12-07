@@ -19,7 +19,7 @@ DRIVEDataSetPath = './data/DRIVE'
 STAREDataSetPath = './data/Stare/'
 CHASEDB1DataSetPath = './data/CHASEDB1'
 
-def output_debug_image(img, name, dated=True):
+def output_debug_image(img, logger, name, dated=True):
     '''
     params
     img: np.array
@@ -34,16 +34,16 @@ def output_debug_image(img, name, dated=True):
         if dated:
             datestring = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
             name = f'{datestring}_{name}'
-        plt.imsave(os.path.join('debugimages', name), final_img)
-        print(f'------------- print image ---------------')
-        print(f'shape: {img.shape}')
-        print(f'range: {np.min(final_img)} to {np.max(final_img)}')
-        print(f'save as: {name}')
+        plt.imsave(name, final_img)
+        logger.info(f'------------- print image ---------------')
+        logger.info(f'shape: {img.shape}')
+        logger.info(f'range: {np.min(final_img)} to {np.max(final_img)}')
+        logger.info(f'save as: {name}')
     except Exception as e:
-        print(f'ERROR: unable to save image {name} with shape {img.shape}')
-        print(e)
+        logger.info(f'ERROR: unable to save image {name} with shape {img.shape}')
+        logger.info(e)
 
-def get_data(dataset, img_name, img_size=256, gpu=True, flag='train', debug=False):
+def get_data(debugimages_path, logger, dataset, img_name, img_size=256, gpu=True, flag='train', debug=False):
 
     def get_label(label):
         tmp_gt = label.copy()
@@ -93,8 +93,8 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train', debug=Fals
             img = cv2.imread(img_path)
             label = cv2.imread(label_path)
             if debug:
-                output_debug_image(img, f'debug_src_{i}.png') # + os.path.basename(img_path))
-                output_debug_image(label, f'debug_src_label_{i}.png') # + os.path.basename(label_path))
+                output_debug_image(img, logger,str.join(debugimages_path, f'debug_src_{i}.png')) # + os.path.basename(img_path))
+                output_debug_image(label,  logger,str.join(debugimages_path, f'debug_src_label_{i}.png')) # + os.path.basename(label_path))
             if label is not None:
                 label = label[:,:,0]
                 
@@ -178,8 +178,8 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train', debug=Fals
         label[label >= 1] = 1
         
         if debug:
-            output_debug_image(img.cpu(), f'debug_preprocessed_img_{i}.png')
-            output_debug_image(label.cpu(), f'debug_preprocessed_label_{i}.png')
+            output_debug_image(img.cpu(), logger,str.join(debugimages_path, f'debug_preprocessed_img_{i}.png'))
+            output_debug_image(label.cpu(), logger,str.join(debugimages_path,f'debug_preprocessed_label_{i}.png'))
         
         images.append(img)
         labels.append(label)
@@ -197,63 +197,30 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train', debug=Fals
 
     return images, imageGreys, labels, tmp_gts, img_shape, label_ori
 
-<<<<<<< HEAD
-# def calculate_Accuracy(confusion):
-#     confusion=np.asarray(confusion)
-#     pos = np.sum(confusion, 1).astype(np.float32) # 1 for row
-#     res = np.sum(confusion, 0).astype(np.float32) # 0 for coloum
-#     tp = np.diag(confusion).astype(np.float32)
-#     IU = tp / (pos + res - tp)
-#     meanIU = np.mean(IU)
-#     Acc = np.sum(tp) / np.sum(confusion)
-#     Se = confusion[1][1] / (confusion[1][1]+confusion[0][1])
-#     Sp = confusion[0][0] / (confusion[0][0]+confusion[1][0])
-#     return  meanIU,Acc,Se,Sp,IU
-
-def calculate_Accuracy(confusion):
-    confusion = np.asarray(confusion)
-    pos = np.sum(confusion, 1).astype(np.float32)  # Sum of rows (true labels)
-    res = np.sum(confusion, 0).astype(np.float32)  # Sum of columns (predictions)
-    tp = np.diag(confusion).astype(np.float32)     # Diagonal (True Positives)
-    IU = tp / (pos + res - tp)  # Intersection over Union
-=======
-def calculate_Accuracy(confusion, debug=False):
+def calculate_Accuracy(confusion, logger,debug=False):
     confusion=np.asarray(confusion)
     pos = np.sum(confusion, 1).astype(np.float32) # 1 for row
     res = np.sum(confusion, 0).astype(np.float32) # 0 for coloum
     tp = np.diag(confusion).astype(np.float32)
     IU = tp / (pos + res - tp)
->>>>>>> origin/v1
     meanIU = np.mean(IU)
     
     # Accuracy: sum of true positives / total sum
     Acc = np.sum(tp) / np.sum(confusion)
-<<<<<<< HEAD
-    
-    # Sensitivity (Recall, True Positive Rate)
-    Se = confusion[1, 1] / (confusion[1, 1] + confusion[0, 1])  # TP / (TP + FN)
-    
-    # Specificity (True Negative Rate)
-    Sp = confusion[0, 0] / (confusion[0, 0] + confusion[1, 0])  # TN / (TN + FP)
-
-    return meanIU, Acc, Se, Sp, IU
-
-=======
     Se = confusion[1][1] / (confusion[1][1]+confusion[0][1])
     Sp = confusion[0][0] / (confusion[0][0]+confusion[1][0])
     if debug:
         # print out everything
-        print(f'confusion: {confusion}')
-        print(f'pos: {pos}')
-        print(f'res: {res}')
-        print(f'tp: {tp}')
-        print(f'IU: {IU}')
-        print(f'meanIU: {meanIU}')
-        print(f'Acc: {Acc}')
-        print(f'Se: {Se}')
-        print(f'Sp: {Sp}')
+        logger.info(f'confusion: {confusion}')
+        logger.info(f'pos: {pos}')
+        logger.info(f'res: {res}')
+        logger.info(f'tp: {tp}')
+        logger.info(f'IU: {IU}')
+        logger.info(f'meanIU: {meanIU}')
+        logger.info(f'Acc: {Acc}')
+        logger.info(f'Se: {Se}')
+        logger.info(f'Sp: {Sp}')
     return  meanIU,Acc,Se,Sp,IU
->>>>>>> origin/v1
 
 def get_model(model_name):
     if model_name=='M_Net':
