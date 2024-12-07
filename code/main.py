@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import os
 import argparse
 import time
-from core.utils import calculate_Accuracy, get_img_list, get_model, get_data
+from core.utils import calculate_Accuracy, get_img_list, get_model, get_data, output_debug_image
 from pylab import *
 import random
 import warnings
@@ -114,12 +114,16 @@ def fast_test(model, args, img_list, model_name, logger):
         y_pred = y_pred.reshape([-1])
         ppi = np.argmax(out, 1)
 
+        print(f'ppi: {ppi.shape}, tmp_gt: {label_ori.shape}')
+        print(f'ppi min: {np.min(ppi)}, max: {np.max(ppi)}')
+        print(f'label_ori min: {np.min(label_ori)}, max: {np.max(label_ori)}')
+
         tmp_out = ppi.reshape([-1])
         tmp_gt = label_ori.reshape([-1])
         logger.info(f"tmp_gt shape: {tmp_gt.shape}, values: {tmp_gt}")
 
         my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)
-        meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion)
+        meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion, debug=True)
         Auc = roc_auc_score(tmp_gt, y_pred)
         AUC.append(Auc)
 
@@ -133,7 +137,17 @@ def fast_test(model, args, img_list, model_name, logger):
         all_true_labels.extend(tmp_gt)
         all_pred_scores.extend(y_pred)
 
+<<<<<<< HEAD
         end = time.time()
+=======
+    dry = 'Acc: %s  |  Se: %s |  Sp: %s |  Auc: %s |  Background_IOU: %s |  vessel_IOU: %s '%(str(np.mean(np.stack(ACC))),str(np.mean(np.stack(SE))), str(np.mean(np.stack(SP))),str(np.mean(np.stack(AUC))),str(np.mean(np.stack(Background_IOU))),str(np.mean(np.stack(Vessel_IOU))))
+    print(dry)
+
+    # store test information
+    with open(r'./logs/%s_%s.txt' % (model_name, args.my_description), 'a+') as f:
+        f.write(dry)
+        f.write('\n\n')
+>>>>>>> origin/v1
 
         logger.info(
             str(i + 1)
@@ -327,6 +341,7 @@ for epoch in range(args.epochs):
         args.lr /= 10
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
+<<<<<<< HEAD
     accuracies = []
     sensitivity_epoch = []
     specificity_epoch = []
@@ -348,6 +363,30 @@ for epoch in range(args.epochs):
         out, side_5, side_6, side_7, side_8 = model(img, imageGreys)
 
         # Loss calculation
+=======
+    for i, (start, end) in enumerate(zip(range(0, len(img_list), args.batch_size),
+                                         range(args.batch_size, len(img_list) + args.batch_size,
+                                               args.batch_size))):
+        
+        debug = i == 0 # and epoch % 10 == 0
+
+        path = img_list[start:end]
+        img, imageGreys, gt, tmp_gt, img_shape,label_ori = get_data(Dataset, path, img_size=args.img_size, gpu=args.use_gpu, debug=debug)
+        optimizer.zero_grad()
+        out, side_5, side_6, side_7, side_8 = model(img, imageGreys)
+        
+        if debug:
+            #output = criterion(m(out), gt)
+            outimg = softmax_2d(out).cpu().detach().numpy()
+            # print(f'out: {out.shape}, out: {torch.min(out)}, {torch.max(out)}')
+            outimg = outimg[0] * 255
+            empty_layer = np.zeros((1, outimg.shape[1], outimg.shape[2]))
+            outimg = np.concatenate((outimg, empty_layer), axis=0)
+            print(f'outimg: {outimg.shape}, outimg: {np.min(outimg)}, {np.max(outimg)}')
+            outimg = np.array(outimg, dtype=np.uint8)
+            output_debug_image(outimg, f'output_{epoch}_{i}.png')
+
+>>>>>>> origin/v1
         out = torch.log(softmax_2d(out) + EPS)
         loss = criterion(out, gt)
         loss += criterion(torch.log(softmax_2d(side_5) + EPS), gt)
@@ -366,6 +405,7 @@ for epoch in range(args.epochs):
         my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)
 
         meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion)
+<<<<<<< HEAD
         accuracies.append(Acc)
         sensitivity_epoch.append(Se)
         specificity_epoch.append(Sp)
@@ -450,3 +490,24 @@ total_training_time = (
 )  # Total training time for all epochs
 logger.info("Model from Epoch %s was saved" % str(best_epoch))
 logger.info("Total training time: %.2f seconds" % total_training_time)
+=======
+
+        print(str('model: {:s}_{:s} | epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} | Se: {:.3f} | Sp: {:.3f}'
+                  '| Background_IOU: {:f}, vessel_IOU: {:f}').format(model_name, args.my_description,epoch, i, loss.item(), Acc,Se,Sp,
+                                                                                  IU[0], IU[1]))
+
+    print('training finish, time: %.1f s' % (time.time() - begin_time))
+
+    if epoch % 2 == 0 and epoch != 0:
+        Accuracy = fast_test(model, args, test_img_list, model_name)
+        print('BestAccuracy:',BestAccuracy)
+        if Accuracy > BestAccuracy:
+            BestAccuracy = Accuracy
+            directory = '%s/models/%s_%s'%(RootDir, model_name, args.my_description)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            torch.save(model.state_dict(),
+                       os.path.join(directory, '%s.pth' % str(epoch)))
+            # For evaluation
+            print('success save Nucleus_best model')
+>>>>>>> origin/v1

@@ -11,14 +11,39 @@ from imgaug import augmenters as iaa
 import imgaug as ia
 from imgaug.augmentables.segmaps import SegmentationMapsOnImage
 from matplotlib import pyplot as plt
-import matplotlib; 
+import matplotlib
+from datetime import datetime
 #matplotlib.use('TkAgg')
 
 DRIVEDataSetPath = './data/DRIVE'
 STAREDataSetPath = './data/Stare/'
 CHASEDB1DataSetPath = './data/CHASEDB1'
 
-def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
+def output_debug_image(img, name, dated=True):
+    '''
+    params
+    img: np.array
+    name: str (should contain extension)
+    dated: bool (whether to prefix the filename with the date and time)
+    '''
+    try:
+        final_img = np.array(img, dtype=np.uint8)
+        if final_img.shape[0] < 5: # this is the color dimension
+            final_img = np.transpose(final_img, [1, 2, 0])
+        # maybe add a date to the name to keep it from being overwritten between images
+        if dated:
+            datestring = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+            name = f'{datestring}_{name}'
+        plt.imsave(os.path.join('debugimages', name), final_img)
+        print(f'------------- print image ---------------')
+        print(f'shape: {img.shape}')
+        print(f'range: {np.min(final_img)} to {np.max(final_img)}')
+        print(f'save as: {name}')
+    except Exception as e:
+        print(f'ERROR: unable to save image {name} with shape {img.shape}')
+        print(e)
+
+def get_data(dataset, img_name, img_size=256, gpu=True, flag='train', debug=False):
 
     def get_label(label):
         tmp_gt = label.copy()
@@ -67,6 +92,9 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
             label_path = os.path.join(CHASEDB1DataSetPath, 'label', label_name)
             img = cv2.imread(img_path)
             label = cv2.imread(label_path)
+            if debug:
+                output_debug_image(img, f'debug_src_{i}.png') # + os.path.basename(img_path))
+                output_debug_image(label, f'debug_src_label_{i}.png') # + os.path.basename(label_path))
             if label is not None:
                 label = label[:,:,0]
                 
@@ -93,7 +121,11 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
                 label = label[:,:,0]
 
         img_shape.append(img.shape)
-        label_ori.append(label)
+
+        label_ori_temp = label.copy()
+        label_ori_temp[label_ori_temp < 1] = 0
+        label_ori_temp[label_ori_temp >= 1] = 1
+        label_ori.append(label_ori_temp)
         # 0 : Optic Cup     ----> Class 2
         # 128 : Optic Disc  ----> Class 1
         # 255 : BackGround
@@ -142,9 +174,13 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
             imgGrey = imgGrey.cuda()
 
         label, tmp_gt = get_label(label)
-        if torch.max(label) > 2:
-            label[label < 255] = 0
-            label[label == 255] = 1
+        label[label < 1] = 0
+        label[label >= 1] = 1
+        
+        if debug:
+            output_debug_image(img.cpu(), f'debug_preprocessed_img_{i}.png')
+            output_debug_image(label.cpu(), f'debug_preprocessed_label_{i}.png')
+        
         images.append(img)
         labels.append(label)
         tmp_gts.append(tmp_gt)
@@ -161,6 +197,7 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
 
     return images, imageGreys, labels, tmp_gts, img_shape, label_ori
 
+<<<<<<< HEAD
 # def calculate_Accuracy(confusion):
 #     confusion=np.asarray(confusion)
 #     pos = np.sum(confusion, 1).astype(np.float32) # 1 for row
@@ -179,10 +216,19 @@ def calculate_Accuracy(confusion):
     res = np.sum(confusion, 0).astype(np.float32)  # Sum of columns (predictions)
     tp = np.diag(confusion).astype(np.float32)     # Diagonal (True Positives)
     IU = tp / (pos + res - tp)  # Intersection over Union
+=======
+def calculate_Accuracy(confusion, debug=False):
+    confusion=np.asarray(confusion)
+    pos = np.sum(confusion, 1).astype(np.float32) # 1 for row
+    res = np.sum(confusion, 0).astype(np.float32) # 0 for coloum
+    tp = np.diag(confusion).astype(np.float32)
+    IU = tp / (pos + res - tp)
+>>>>>>> origin/v1
     meanIU = np.mean(IU)
     
     # Accuracy: sum of true positives / total sum
     Acc = np.sum(tp) / np.sum(confusion)
+<<<<<<< HEAD
     
     # Sensitivity (Recall, True Positive Rate)
     Se = confusion[1, 1] / (confusion[1, 1] + confusion[0, 1])  # TP / (TP + FN)
@@ -192,6 +238,22 @@ def calculate_Accuracy(confusion):
 
     return meanIU, Acc, Se, Sp, IU
 
+=======
+    Se = confusion[1][1] / (confusion[1][1]+confusion[0][1])
+    Sp = confusion[0][0] / (confusion[0][0]+confusion[1][0])
+    if debug:
+        # print out everything
+        print(f'confusion: {confusion}')
+        print(f'pos: {pos}')
+        print(f'res: {res}')
+        print(f'tp: {tp}')
+        print(f'IU: {IU}')
+        print(f'meanIU: {meanIU}')
+        print(f'Acc: {Acc}')
+        print(f'Se: {Se}')
+        print(f'Sp: {Sp}')
+    return  meanIU,Acc,Se,Sp,IU
+>>>>>>> origin/v1
 
 def get_model(model_name):
     if model_name=='M_Net':
