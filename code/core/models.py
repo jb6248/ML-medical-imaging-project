@@ -6,7 +6,7 @@ import cv2
 from .FastGuidedFilter import GuidedFilter
 
 class M_Net(nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False):
+    def __init__(self, n_classes, bn=True, BatchNorm=False,r=None, eps=None):
         super(M_Net, self).__init__()
 
         # mutli-scale simple convolution
@@ -69,7 +69,7 @@ class M_Net(nn.Module):
         return [ave_out, side_5, side_6, side_7, side_8]
 
 class UNet512 (nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False):
+    def __init__(self, n_classes, bn=True, BatchNorm=False,r=None, eps=None):
         super(UNet512, self).__init__()
 
         #1024
@@ -113,18 +113,13 @@ class UNet512 (nn.Module):
         return [out, out, out, out, out]
 
 class DG_Net(nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False):
+    def __init__(self, n_classes, bn=True, BatchNorm=False, r=2, eps=1e-8):
         super(DG_Net, self).__init__()
 
         # mutli-scale simple convolution
         self.conv2 = M_Conv(3, 64, kernel_size=3, bn=bn, BatchNorm=BatchNorm)
         self.conv3 = M_Conv(3, 128, kernel_size=3, bn=bn, BatchNorm=BatchNorm)
         self.conv4 = M_Conv(3, 256, kernel_size=3, bn=bn, BatchNorm=BatchNorm)
-
-        self.changeU1 = nn.Conv2d(in_channels=256 * 2, out_channels=256, kernel_size=3, padding=1)
-        self.changeU2 = nn.Conv2d(in_channels=128 * 2, out_channels=128, kernel_size=3, padding=1)
-        self.changeU3 = nn.Conv2d(in_channels=64 * 2, out_channels=64, kernel_size=3, padding=1)
-        self.changeU4 = nn.Conv2d(in_channels=32 * 2, out_channels=32, kernel_size=3, padding=1)
 
         # the down convolution contain concat operation
         self.down1 = M_Encoder(3, 32, kernel_size=3, bn=bn, BatchNorm=BatchNorm)  # 512
@@ -153,7 +148,8 @@ class DG_Net(nn.Module):
         self.side_8 = nn.Conv2d(32, n_classes, kernel_size=1, padding=0, stride=1, bias=True)
 
         #self.gf = SGGuidedFilter(r=2, eps=1e-2)
-        self.gf = GuidedFilter(r=2, eps=1e-2)
+        # self.gf = GuidedFilter(r=2, eps=1e-2)
+        self.gf = GuidedFilter(r, eps) # CHANGED FROM DISCORD
 
     def forward(self, x, ImgGreys):
         _, _, img_shape, _ = x.size()
