@@ -14,7 +14,7 @@ def diff_x(input, r):
 
 def diff_y(input, r):
     assert input.dim() == 4
-
+    
     left   = input[:, :, :,         r:2 * r + 1]
     middle = input[:, :, :, 2 * r + 1:         ] - input[:, :, :,           :-2 * r - 1]
     right  = input[:, :, :,        -1:         ] - input[:, :, :, -2 * r - 1:    -r - 1]
@@ -30,6 +30,6 @@ class BoxFilter(nn.Module):
 
     def forward(self, x):
         assert x.dim() == 4
-
+        self.r = int(self.r)
         return diff_y(diff_x(x.cumsum(dim=2), self.r).cumsum(dim=3), self.r)
 

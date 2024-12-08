@@ -14,9 +14,9 @@ from matplotlib import pyplot as plt
 import matplotlib; 
 #matplotlib.use('TkAgg')
 
-DRIVEDataSetPath = './data'
-STAREDataSetPath = './data'
-CHASEDB1DataSetPath = './data'
+DRIVEDataSetPath = './data/DRIVE'
+STAREDataSetPath = './data/Stare/'
+CHASEDB1DataSetPath = './data/CHASEDB1'
 
 def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
 
@@ -161,17 +161,37 @@ def get_data(dataset, img_name, img_size=256, gpu=True, flag='train'):
 
     return images, imageGreys, labels, tmp_gts, img_shape, label_ori
 
+# def calculate_Accuracy(confusion):
+#     confusion=np.asarray(confusion)
+#     pos = np.sum(confusion, 1).astype(np.float32) # 1 for row
+#     res = np.sum(confusion, 0).astype(np.float32) # 0 for coloum
+#     tp = np.diag(confusion).astype(np.float32)
+#     IU = tp / (pos + res - tp)
+#     meanIU = np.mean(IU)
+#     Acc = np.sum(tp) / np.sum(confusion)
+#     Se = confusion[1][1] / (confusion[1][1]+confusion[0][1])
+#     Sp = confusion[0][0] / (confusion[0][0]+confusion[1][0])
+#     return  meanIU,Acc,Se,Sp,IU
+
 def calculate_Accuracy(confusion):
-    confusion=np.asarray(confusion)
-    pos = np.sum(confusion, 1).astype(np.float32) # 1 for row
-    res = np.sum(confusion, 0).astype(np.float32) # 0 for coloum
-    tp = np.diag(confusion).astype(np.float32)
-    IU = tp / (pos + res - tp)
+    confusion = np.asarray(confusion)
+    pos = np.sum(confusion, 1).astype(np.float32)  # Sum of rows (true labels)
+    res = np.sum(confusion, 0).astype(np.float32)  # Sum of columns (predictions)
+    tp = np.diag(confusion).astype(np.float32)     # Diagonal (True Positives)
+    IU = tp / (pos + res - tp)  # Intersection over Union
     meanIU = np.mean(IU)
+    
+    # Accuracy: sum of true positives / total sum
     Acc = np.sum(tp) / np.sum(confusion)
-    Se = confusion[1][1] / (confusion[1][1]+confusion[0][1])
-    Sp = confusion[0][0] / (confusion[0][0]+confusion[1][0])
-    return  meanIU,Acc,Se,Sp,IU
+    
+    # Sensitivity (Recall, True Positive Rate)
+    Se = confusion[1, 1] / (confusion[1, 1] + confusion[0, 1])  # TP / (TP + FN)
+    
+    # Specificity (True Negative Rate)
+    Sp = confusion[0, 0] / (confusion[0, 0] + confusion[1, 0])  # TN / (TN + FP)
+
+    return meanIU, Acc, Se, Sp, IU
+
 
 def get_model(model_name):
     if model_name=='M_Net':

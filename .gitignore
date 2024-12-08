@@ -1,2 +1,10 @@
 data/
 **/__pycache__
+
+logs/
+models/
+# Ignore all contents in the experiment_runs/ directory
+experiment_runs/*
+
+# But do not ignore the placeholder directory
+!experiment_runs/run_example_place_holder/
