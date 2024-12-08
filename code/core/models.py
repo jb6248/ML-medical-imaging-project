@@ -121,11 +121,6 @@ class DG_Net(nn.Module):
         self.conv3 = M_Conv(3, 128, kernel_size=3, bn=bn, BatchNorm=BatchNorm)
         self.conv4 = M_Conv(3, 256, kernel_size=3, bn=bn, BatchNorm=BatchNorm)
 
-        self.changeU1 = nn.Conv2d(in_channels=256 * 2, out_channels=256, kernel_size=3, padding=1)
-        self.changeU2 = nn.Conv2d(in_channels=128 * 2, out_channels=128, kernel_size=3, padding=1)
-        self.changeU3 = nn.Conv2d(in_channels=64 * 2, out_channels=64, kernel_size=3, padding=1)
-        self.changeU4 = nn.Conv2d(in_channels=32 * 2, out_channels=32, kernel_size=3, padding=1)
-
         # the down convolution contain concat operation
         self.down1 = M_Encoder(3, 32, kernel_size=3, bn=bn, BatchNorm=BatchNorm)  # 512
         self.down2 = M_Encoder(64, 64, kernel_size=3, bn=bn, BatchNorm=BatchNorm)  # 256
