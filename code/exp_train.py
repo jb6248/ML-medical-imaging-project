@@ -74,24 +74,40 @@ def train_experiement(
                 ),
             )
         ):
-            debug = i == 0 # and epoch % 10 == 0
+            debug = i == 0 and (epoch == (args.epochs - 1) or epoch % 10 == 0)
             path = img_list[start:end]
             img, imageGreys, gt, tmp_gt, img_shape, label_ori = get_data(
-                debugimages_path, logger, dataset, path, img_size=args.img_size, gpu=args.use_gpu,debug=debug
+                debugimages_path, logger, dataset, path, img_size=args.img_size, gpu=args.use_gpu,
+                debug=debug and (epoch % 20 == 0 or epoch == (args.epochs - 1))
             )
             optimizer.zero_grad()
-            out, side_5, side_6, side_7, side_8 = model(img, imageGreys)
+            out, side_5, side_6, side_7, side_8 = model(img, imageGreys, debug=debug)
 
             if debug:
                 #output = criterion(m(out), gt)
-                outimg = softmax_2d(out).cpu().detach().numpy()
+                prediction = softmax_2d(out).cpu().detach().numpy()
                 # print(f'out: {out.shape}, out: {torch.min(out)}, {torch.max(out)}')
-                outimg = outimg[0] * 255
+                outimg = prediction[0] * 255
                 empty_layer = np.zeros((1, outimg.shape[1], outimg.shape[2]))
                 outimg = np.concatenate((outimg, empty_layer), axis=0)
                 logger.info(f'outimg: {outimg.shape}, outimg: {np.min(outimg)}, {np.max(outimg)}')
                 outimg = np.array(outimg, dtype=np.uint8)
-                output_debug_image(outimg, logger, str.join(debugimages_path,f'output_{epoch}_{i}.png'), dated=True)
+                output_debug_image(outimg, logger, os.path.join(debugimages_path, f'output_{epoch}_{i}.png'), dated=True)
+
+                # show the differences using a color scheme:
+                # TP: WHITE
+                # FP: RED
+                # FN: BLUE
+                # TN: BLACK
+
+                logger.info(f'prediction: {prediction.shape}, gt: {gt.shape}')
+                prediction = np.argmax(prediction, axis=1)[0]
+                debug_gt = gt.cpu().detach().numpy()
+                debug_img = np.zeros((prediction.shape[0], prediction.shape[1], 3), dtype=np.uint8)
+                debug_img[:, :, 0] = prediction * 255
+                debug_img[:, :, 1] = (debug_gt & prediction) * 255
+                debug_img[:, :, 2] = debug_gt * 255
+                output_debug_image(debug_img, logger, os.path.join(debugimages_path, f'output_diff_{epoch}_{i}_diff.png'), dated=True)
 
             # Loss calculation
             out = torch.log(softmax_2d(out) + PAPER_EPS)
@@ -111,7 +127,7 @@ def train_experiement(
 
             my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)
 
-            meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion, logger, debug=True)
+            meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion, logger, debug=False)
             accuracies.append(Acc)
             sensitivity_epoch.append(Se)
             specificity_epoch.append(Sp)

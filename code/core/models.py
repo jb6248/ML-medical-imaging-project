@@ -4,9 +4,13 @@ import torch.nn.functional as F
 from .blocks import *
 import cv2
 from .FastGuidedFilter import GuidedFilter
+from .debug import output_debug_image
+from sklearn.decomposition import PCA
+import os
+import numpy as np
 
 class M_Net(nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False,r=None, eps=None):
+    def __init__(self, n_classes, bn=True, BatchNorm=False,r=None, eps=None, logger=None, debug_img_dir=None):
         super(M_Net, self).__init__()
 
         # mutli-scale simple convolution
@@ -69,7 +73,7 @@ class M_Net(nn.Module):
         return [ave_out, side_5, side_6, side_7, side_8]
 
 class UNet512 (nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False,r=None, eps=None):
+    def __init__(self, n_classes, bn=True, BatchNorm=False,r=None, eps=None, logger=None, debug_img_dir=None):
         super(UNet512, self).__init__()
 
         #1024
@@ -112,8 +116,60 @@ class UNet512 (nn.Module):
         #out = torch.squeeze(out, dim=1)
         return [out, out, out, out, out]
 
+def debug_show_GFM_before_after(f_before, f_after, logger, debug_dir, name):
+    # feat = np.random.rand(32, 512, 512)
+    # >>> flatmap = feat.reshape(32, -1).T
+    # >>> flatmap.shape
+    # (262144, 32)
+    # >>> pca = PCA(n_components=1)
+    # >>> reduced_features = pca.fit_transform(flatmap)
+    # >>> visual = reduced_features.reshape(512, 512)
+    # >>> visual -= visual.min()
+    # >>> visual /= visual.max()
+    # >>> visual.shape
+    # (512, 512)
+    # >>> plt.imsave('hi.png', visual)
+
+    f_before = f_before.cpu().detach().numpy()[0]
+    f_after = f_after.cpu().detach().numpy()[0]
+    # (features, height, width)
+
+    logger.info(f'f_before: {f_before.shape}, f_after: {f_after.shape}')
+    features = f_before.shape[0]
+    size = f_before.shape[1]
+    components = 3
+
+    # def get_pca_img(feat):
+    #     flatmap = feat.reshape(features, -1).T
+    #     pca = PCA(n_components=components)
+    #     reduced_features = pca.fit_transform(flatmap)
+    #     visual = reduced_features.reshape(size, size, components)
+    #     visual -= visual.min()
+    #     visual /= visual.max()
+    #     return visual
+    # visual_before = get_pca_img(f_before)
+    # visual_after = get_pca_img(f_after)
+
+    flatmap = np.array([f_before, f_after]).reshape(features, -1).T
+    pca = PCA(n_components=components)
+    reduced_features = pca.fit_transform(flatmap)
+    visuals = reduced_features.reshape(2, size, size, components)
+    visuals -= visuals.min()
+    visuals /= visuals.max()
+    visual_before = visuals[0]
+    visual_after = visuals[1]
+    output_debug_image(visual_before * 255, logger, os.path.join(debug_dir, f'GFM_before_{name}.png'))
+    output_debug_image(visual_after * 255, logger, os.path.join(debug_dir, f'GFM_after_{name}.png'))
+    diff = visual_after - visual_before
+    # square diff
+    diff = diff * diff
+    # rescale
+    diff -= diff.min()
+    diff /= diff.max()
+    output_debug_image(diff * 255, logger, os.path.join(debug_dir, f'GFM_diff_{name}.png'))
+
 class DG_Net(nn.Module):
-    def __init__(self, n_classes, bn=True, BatchNorm=False, r=2, eps=1e-8):
+    def __init__(self, n_classes, bn=True, BatchNorm=False, r=2, eps=1e-8, logger=None, debug_img_dir=None):
         super(DG_Net, self).__init__()
 
         # mutli-scale simple convolution
@@ -151,7 +207,10 @@ class DG_Net(nn.Module):
         # self.gf = GuidedFilter(r=2, eps=1e-2)
         self.gf = GuidedFilter(r, eps) # CHANGED FROM DISCORD
 
-    def forward(self, x, ImgGreys):
+        self.logger = logger
+        self.debug_img_dir = debug_img_dir
+
+    def forward(self, x, ImgGreys, debug=False):
         _, _, img_shape, _ = x.size()
 
         ImgGreys_2 = F.upsample(ImgGreys, size=(int(img_shape / 2), int(img_shape / 2)), mode='bilinear')
@@ -166,6 +225,8 @@ class DG_Net(nn.Module):
         conv2, out = self.down2(out)
         #out = torch.cat([self.conv3(x_3), out], dim=1)
         up2_1 = self.gf(ImgGreys_3, out.double())
+        if debug:
+            debug_show_GFM_before_after(out, up2_1, self.logger, self.debug_img_dir, 'down2')
         out = torch.cat([up2_1, out], dim=1)
 
         conv3, out = self.down3(out)

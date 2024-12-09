@@ -87,7 +87,7 @@ def clear_directory(directory_path):
                 os.remove(file_path)  # Remove file
 
 # Reusable function to initialize the model
-def initialize_model(args, model_name, n_classes, eps, r, group_norm, batch_norm, use_gpu, logger):
+def initialize_model(args, model_name, n_classes, eps, r, group_norm, batch_norm, use_gpu, logger, debug_img_dir):
     model = get_model(model_name)
     logger.info(f"Model: {model}")
     model = model(
@@ -95,7 +95,9 @@ def initialize_model(args, model_name, n_classes, eps, r, group_norm, batch_norm
         bn=group_norm,
         BatchNorm=batch_norm,
         r=r,
-        eps=eps
+        eps=eps,
+        logger=logger,
+        debug_img_dir=debug_img_dir,
     )
     
     if torch.cuda.device_count() > 1:
@@ -134,7 +136,7 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     log_file_path = os.path.join(window_path, "logger_train.log")
     train_logger = create_logger(log_file_path)
     
-    model = initialize_model(args,model_name, args.n_class, eps, r, args.GroupNorm, args.BatchNorm, args.use_gpu, train_logger)
+    model = initialize_model(args, model_name, args.n_class, eps, r, args.GroupNorm, args.BatchNorm, args.use_gpu, train_logger, debugimages_path)
     log_run_variables(train_logger, model_name, dataset, sub_id, args, model)
     train_logger.info(str(model.parameters()))
     
@@ -143,13 +145,15 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     softmax_2d = nn.Softmax2d()
 
     # Training experiment
+    train_logger.info(f'debugimages_path: {debugimages_path}')
+    os.makedirs(debugimages_path, exist_ok=True)
     train_experiement(train_logger, window_path, args, model, model_name, train_img_list, criterion, dataset, softmax_2d, optimizer, debugimages_path)
     train_logger.close()
 
     # Testing
     test_log_file_path = os.path.join(window_path, "logger_test.log")
     test_logger = create_logger(test_log_file_path)
-    test_model = initialize_model(args,model_name, args.n_class, eps, r, args.GroupNorm, args.BatchNorm, args.use_gpu, test_logger)
+    test_model = initialize_model(args,model_name, args.n_class, eps, r, args.GroupNorm, args.BatchNorm, args.use_gpu, test_logger, debugimages_path)
     
     log_run_variables(test_logger, model_name, dataset, sub_id, args, test_model)
     
@@ -187,7 +191,7 @@ def main():
 
     # Run experiments with different EPS and R values
     EPS_WINDOW = [1e-10, 1e-9, 1e-8, 1e-7, 1e-6]
-    R_WINDOW = [-1, 1, 2, 3, 4]
+    R_WINDOW = [1, 2, 3, 4]
 
     for eps in EPS_WINDOW:
         for r in R_WINDOW:

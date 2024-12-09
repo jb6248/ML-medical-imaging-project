@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 import os
 import argparse
 import time
-from core.utils import calculate_Accuracy, get_img_list, get_model, get_data, output_debug_image
+from core.debug import output_debug_image
+from core.utils import calculate_Accuracy, get_img_list, get_model, get_data
 from pylab import *
 import random
 import warnings
@@ -357,7 +358,7 @@ for epoch in range(args.epochs):
             outimg = np.concatenate((outimg, empty_layer), axis=0)
             print(f'outimg: {outimg.shape}, outimg: {np.min(outimg)}, {np.max(outimg)}')
             outimg = np.array(outimg, dtype=np.uint8)
-            output_debug_image(outimg, f'output_{epoch}_{i}.png')
+            output_debug_image(outimg, os.path.join(f'output_{epoch}_{i}.png')
 
         out = torch.log(softmax_2d(out) + EPS)
         loss = criterion(out, gt)

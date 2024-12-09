@@ -13,35 +13,12 @@ from imgaug.augmentables.segmaps import SegmentationMapsOnImage
 from matplotlib import pyplot as plt
 import matplotlib
 from datetime import datetime
+from .debug import output_debug_image
 #matplotlib.use('TkAgg')
 
 DRIVEDataSetPath = './data/DRIVE'
 STAREDataSetPath = './data/Stare/'
 CHASEDB1DataSetPath = './data/CHASEDB1'
-
-def output_debug_image(img, logger, name, dated=True):
-    '''
-    params
-    img: np.array
-    name: str (should contain extension)
-    dated: bool (whether to prefix the filename with the date and time)
-    '''
-    try:
-        final_img = np.array(img, dtype=np.uint8)
-        if final_img.shape[0] < 5: # this is the color dimension
-            final_img = np.transpose(final_img, [1, 2, 0])
-        # maybe add a date to the name to keep it from being overwritten between images
-        if dated:
-            datestring = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-            name = f'{datestring}_{name}'
-        plt.imsave(name, final_img)
-        logger.info(f'------------- print image ---------------')
-        logger.info(f'shape: {img.shape}')
-        logger.info(f'range: {np.min(final_img)} to {np.max(final_img)}')
-        logger.info(f'save as: {name}')
-    except Exception as e:
-        logger.info(f'ERROR: unable to save image {name} with shape {img.shape}')
-        logger.info(e)
 
 def get_data(debugimages_path, logger, dataset, img_name, img_size=256, gpu=True, flag='train', debug=False):
 
@@ -93,8 +70,8 @@ def get_data(debugimages_path, logger, dataset, img_name, img_size=256, gpu=True
             img = cv2.imread(img_path)
             label = cv2.imread(label_path)
             if debug:
-                output_debug_image(img, logger,str.join(debugimages_path, f'debug_src_{i}.png')) # + os.path.basename(img_path))
-                output_debug_image(label,  logger,str.join(debugimages_path, f'debug_src_label_{i}.png')) # + os.path.basename(label_path))
+                output_debug_image(img, logger, os.path.join(debugimages_path, f'debug_src_{i}.png')) # + os.path.basename(img_path))
+                output_debug_image(label,  logger, os.path.join(debugimages_path, f'debug_src_label_{i}.png')) # + os.path.basename(label_path))
             if label is not None:
                 label = label[:,:,0]
                 
@@ -178,8 +155,8 @@ def get_data(debugimages_path, logger, dataset, img_name, img_size=256, gpu=True
         label[label >= 1] = 1
         
         if debug:
-            output_debug_image(img.cpu(), logger,str.join(debugimages_path, f'debug_preprocessed_img_{i}.png'))
-            output_debug_image(label.cpu(), logger,str.join(debugimages_path,f'debug_preprocessed_label_{i}.png'))
+            output_debug_image(img.cpu(), logger, os.path.join(debugimages_path, f'debug_preprocessed_img_{i}.png'))
+            output_debug_image(label.cpu(), logger, os.path.join(debugimages_path,f'debug_preprocessed_label_{i}.png'))
         
         images.append(img)
         labels.append(label)
