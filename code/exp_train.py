@@ -3,6 +3,7 @@ import sys
 from prettytable import PrettyTable
 import torch
 import sklearn.metrics as metrics
+from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 
 import time
@@ -60,6 +61,8 @@ def train_experiement(
             optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
         accuracies = []
+        # AUC
+        AUC = []
         sensitivity_epoch = []
         specificity_epoch = []
         losses = []
@@ -125,6 +128,28 @@ def train_experiement(
             tmp_out = ppi.reshape([-1])
             tmp_gt = tmp_gt.reshape([-1])
 
+            # calculating AUC --------------
+            y_pred = out[:, 1, :, :]
+            y_pred = y_pred.reshape([-1])
+
+            #tmp_gt2 = label_ori.reshape([-1])
+
+            # using detatch().numpy() to try and fix error 
+            #input1 = tmp_gt2.detach().numpy()
+            input2 = y_pred.detach().numpy()
+
+            print('tmp_gt, size:')
+            print(tmp_gt.size)
+            print(tmp_gt)
+            print('y_pred, size:')
+            print(input2.size)
+            print(input2)
+
+            Auc = roc_auc_score(tmp_gt,input2, multi_class='ovr')
+            AUC.append(Auc)
+
+            # ----------------------------
+
             my_confusion = metrics.confusion_matrix(tmp_out, tmp_gt).astype(np.float32)
 
             meanIU, Acc, Se, Sp, IU = calculate_Accuracy(my_confusion, logger, debug=False)
@@ -137,13 +162,14 @@ def train_experiement(
 
             logger.info(
                 str(
-                    "epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} | Se: {:.3f} | Sp: {:.3f}"
+                    "epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} | AUCL: {:.3f} | Se: {:.3f} | Sp: {:.3f}"
                     "| Background_IOU: {:f}, vessel_IOU: {:f}"
                 ).format(
                     epoch,
                     i,
                     loss.item(),
                     Acc,
+                    AUC,
                     Se,
                     Sp,
                     IU[0],

@@ -144,12 +144,14 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     criterion = nn.NLLLoss2d()
     softmax_2d = nn.Softmax2d()
 
+    print("Training expriment:")
     # Training experiment
     train_logger.info(f'debugimages_path: {debugimages_path}')
     os.makedirs(debugimages_path, exist_ok=True)
     train_experiement(train_logger, window_path, args, model, model_name, train_img_list, criterion, dataset, softmax_2d, optimizer, debugimages_path)
     train_logger.close()
 
+    print("Testing:")
     # Testing
     test_log_file_path = os.path.join(window_path, "logger_test.log")
     test_logger = create_logger(test_log_file_path)
