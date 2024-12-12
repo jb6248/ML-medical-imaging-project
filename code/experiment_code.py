@@ -139,6 +139,8 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     # log the time with a filename like 2024-12-31_23-59-59.txt
     time_filename = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     time_path = os.path.join(window_path, f"{time_filename}.txt")
+    with open(time_path, "w") as f:
+        f.write("")
     
     model = initialize_model(args, model_name, args.n_class, eps, r, args.GroupNorm, args.BatchNorm, args.use_gpu, train_logger, debugimages_path)
     log_run_variables(train_logger, model_name, dataset, sub_id, args, model)
@@ -196,7 +198,7 @@ def main():
     run_window(args, argument_directory_base_path, 1e-8, 2, model_name, dataset, sub_id, train_img_list, test_img_list)
 
     # Run experiments with different EPS and R values
-    EPS_WINDOW = [1e-10, 1e-9, 1e-8, 1e-7, 1e-6]
+    EPS_WINDOW = reversed([1e-10, 1e-9, 1e-8, 1e-7, 1e-6])
     R_WINDOW = [1, 2, 3, 4]
 
     for eps in EPS_WINDOW:

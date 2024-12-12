@@ -241,5 +241,5 @@ def train_experiement(
     total_training_time = (
         time.time() - total_start_time
     )  # Total training time for all epochs
-    logger.info("Model from Epoch %s was saved" % str(best_epoch_number))
+    logger.info("Model from Epoch %s was saved" % str(best_epoch_number + 1))
     logger.info("Total training time: %.2f seconds" % total_training_time)
