@@ -11,6 +11,7 @@ import time
 from core.utils import calculate_Accuracy, get_data
 from pylab import *
 import warnings
+import os
 
 warnings.filterwarnings("ignore")
 torch.set_warn_always(False)
@@ -20,7 +21,7 @@ dataset_list = ["DRIVE", "STARE", "CHASEDB1"]
 
 
 EPS = 1e-12
-def test_experiment(model, args, img_list, model_name, logger):
+def test_experiment(model, args, img_list, model_name, logger, debug_images_path):
     softmax_2d = nn.Softmax2d()
 
     Background_IOU = []
@@ -37,6 +38,8 @@ def test_experiment(model, args, img_list, model_name, logger):
     for i, path in enumerate(img_list):
         start = time.time()
         img, imageGreys, gt, tmp_gt, img_shape, label_ori = get_data(
+            debug_images_path,
+            logger,
             dataset_list[args.datasetID],
             [path],
             img_size=args.img_size,
@@ -69,8 +72,8 @@ def test_experiment(model, args, img_list, model_name, logger):
         SP.append(Sp)
 
         # Collect true labels and predicted scores for ROC AUC plot
-        all_true_labels.extend(tmp_gt)
-        all_pred_scores.extend(y_pred)
+        all_true_labels.append(tmp_gt)
+        all_pred_scores.append(y_pred)
 
         end = time.time()
 
@@ -84,6 +87,24 @@ def test_experiment(model, args, img_list, model_name, logger):
             )
             + "  |  time:%s" % (end - start)
         )
+
+    all_true_labels = np.concatenate(all_true_labels)
+    all_pred_scores = np.concatenate(all_pred_scores)
+    points = zip(all_true_labels, all_pred_scores)
+    points = sorted(points, key=lambda x: x[0])
+    fpr, tpr, _ = metrics.roc_curve(all_true_labels, all_pred_scores)
+    roc_auc = metrics.auc(fpr, tpr)
+    logger.info(f"Combined ROC AUC: {roc_auc}")
+    plt.figure()
+    plt.plot(fpr, tpr, color="blue", lw=2, label=f"ROC curve (AUC = {roc_auc:.2f})")
+    plt.plot([0, 1], [0, 1], color="gray", lw=2, linestyle="--")
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(f"Receiver Operating Characteristic - {model_name}")
+    plt.legend(loc="lower right")
+    plt.savefig(os.path.join(debug_images_path, f"{model_name}_roc_curve.png"))
 
     logger.info(
         "Averages for fast_test Acc: %s  |  Se: %s |  Sp: %s |  Auc: %s |  Background_IOU: %s |  vessel_IOU: %s "

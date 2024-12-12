@@ -19,12 +19,12 @@ from .debug import output_debug_image
 DRIVEDataSetPath = './data/DRIVE'
 STAREDataSetPath = './data/Stare/'
 
-current_dir = os.getcwd()  # Get the current working directory
-parent_dir = os.path.dirname(current_dir)
-data = os.path.join(parent_dir, "data")
-CHASEDB1DataSetPath = os.path.join(data, "CHASEDB1")
+# current_dir = os.getcwd()  # Get the current working directory
+# parent_dir = os.path.dirname(current_dir)
+# data = os.path.join(parent_dir, "data")
+# CHASEDB1DataSetPath = os.path.join(data, "CHASEDB1")
 
-#CHASEDB1DataSetPath = './data/CHASEDB1'
+CHASEDB1DataSetPath = './data/CHASEDB1'
 
 def get_data(debugimages_path, logger, dataset, img_name, img_size=256, gpu=True, flag='train', debug=False):
 

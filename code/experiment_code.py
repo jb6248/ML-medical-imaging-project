@@ -135,6 +135,10 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     
     log_file_path = os.path.join(window_path, "logger_train.log")
     train_logger = create_logger(log_file_path)
+
+    # log the time with a filename like 2024-12-31_23-59-59.txt
+    time_filename = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    time_path = os.path.join(window_path, f"{time_filename}.txt")
     
     model = initialize_model(args, model_name, args.n_class, eps, r, args.GroupNorm, args.BatchNorm, args.use_gpu, train_logger, debugimages_path)
     log_run_variables(train_logger, model_name, dataset, sub_id, args, model)
@@ -155,7 +159,7 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     # Testing
     test_log_file_path = os.path.join(window_path, "logger_test.log")
     test_logger = create_logger(test_log_file_path)
-    test_model = initialize_model(args,model_name, args.n_class, eps, r, args.GroupNorm, args.BatchNorm, args.use_gpu, test_logger, debugimages_path)
+    test_model = initialize_model(args, model_name, args.n_class, eps, r, args.GroupNorm, args.BatchNorm, args.use_gpu, test_logger, debugimages_path)
     
     log_run_variables(test_logger, model_name, dataset, sub_id, args, test_model)
     
@@ -163,7 +167,7 @@ def run_window(args, base_path, eps, r, model_name, dataset, sub_id, train_img_l
     test_model.load_state_dict(torch.load(test_model_path, weights_only=True))
     test_logger.info(f"Success loading test model: {test_model_path}")
 
-    test_accuracy_mean = test_experiment(test_model, args, test_img_list, f"{model_name}{args.my_description}", test_logger)
+    test_accuracy_mean = test_experiment(test_model, args, test_img_list, f"{model_name}{args.my_description}", test_logger, debugimages_path)
     test_logger.info(f"Test accuracy: {test_accuracy_mean}")
     test_logger.close()
 

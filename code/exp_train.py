@@ -129,24 +129,24 @@ def train_experiement(
             tmp_gt = tmp_gt.reshape([-1])
 
             # calculating AUC --------------
-            y_pred = out[:, 1, :, :]
-            y_pred = y_pred.reshape([-1])
+            # y_pred = out[:, 1, :, :]
+            # y_pred = y_pred.reshape([-1])
 
-            #tmp_gt2 = label_ori.reshape([-1])
+            # #tmp_gt2 = label_ori.reshape([-1])
 
-            # using detatch().numpy() to try and fix error 
-            #input1 = tmp_gt2.detach().numpy()
-            input2 = y_pred.detach().numpy()
+            # # using detatch().numpy() to try and fix error 
+            # #input1 = tmp_gt2.detach().numpy()
+            # input2 = y_pred.cpu().detach().numpy()
 
-            print('tmp_gt, size:')
-            print(tmp_gt.size)
-            print(tmp_gt)
-            print('y_pred, size:')
-            print(input2.size)
-            print(input2)
+            # print('tmp_gt, size:')
+            # print(tmp_gt.size)
+            # print(tmp_gt)
+            # print('y_pred, size:')
+            # print(input2.size)
+            # print(input2)
 
-            Auc = roc_auc_score(tmp_gt,input2, multi_class='ovr')
-            AUC.append(Auc)
+            # Auc = roc_auc_score(tmp_gt,input2, multi_class='ovr')
+            # AUC.append(Auc)
 
             # ----------------------------
 
@@ -162,14 +162,16 @@ def train_experiement(
 
             logger.info(
                 str(
-                    "epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} | AUCL: {:.3f} | Se: {:.3f} | Sp: {:.3f}"
+                    "epoch_batch: {:d}_{:d} | loss: {:f}  | Acc: {:.3f} "
+                    # "| AUCL: {:.3f} "
+                    "| Se: {:.3f} | Sp: {:.3f} "
                     "| Background_IOU: {:f}, vessel_IOU: {:f}"
                 ).format(
                     epoch,
                     i,
                     loss.item(),
                     Acc,
-                    AUC,
+                    # AUC,
                     Se,
                     Sp,
                     IU[0],
