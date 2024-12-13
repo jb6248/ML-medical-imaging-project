@@ -11,6 +11,7 @@ from core.utils import calculate_Accuracy, get_data, output_debug_image
 from pylab import *
 import random
 import warnings
+import numpy as np
 
 warnings.filterwarnings("ignore")
 torch.set_warn_always(False)

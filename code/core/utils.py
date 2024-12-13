@@ -28,9 +28,6 @@ CHASEDB1DataSetPath = './data/CHASEDB1'
 
 def get_data(debugimages_path, logger, dataset, img_name, img_size=256, gpu=True, flag='train', debug=False):
 
-
-    
-
     print(CHASEDB1DataSetPath)
 
     def get_label(label):

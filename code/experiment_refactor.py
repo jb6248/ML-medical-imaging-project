@@ -16,7 +16,7 @@ from core.utils import calculate_Accuracy, get_img_list, get_model, get_data
 from pylab import *
 import random
 import warnings
-
+import numpy as np
 warnings.filterwarnings("ignore")
 torch.set_warn_always(False)
 plt.switch_backend("agg")

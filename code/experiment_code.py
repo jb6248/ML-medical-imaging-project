@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from exp_train import train_experiement
 from exp_test import test_experiment
 import matplotlib.pyplot as plt
-
+import time
 import argparse
 
 from pylab import *

@@ -358,7 +358,7 @@ for epoch in range(args.epochs):
             outimg = np.concatenate((outimg, empty_layer), axis=0)
             print(f'outimg: {outimg.shape}, outimg: {np.min(outimg)}, {np.max(outimg)}')
             outimg = np.array(outimg, dtype=np.uint8)
-            output_debug_image(outimg, os.path.join(f'output_{epoch}_{i}.png')
+            output_debug_image(outimg, os.path.join(f'output_{epoch}_{i}.png'))
 
         out = torch.log(softmax_2d(out) + EPS)
         loss = criterion(out, gt)
